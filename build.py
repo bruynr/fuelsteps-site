@@ -422,6 +422,11 @@ def plan(code):
       <p class="hint">{t["plan_fields_lead"]}</p>
       <ol id="plan-fields" class="fields"></ol>
       <button id="plan-copy-all" class="btn amber" type="button">{t["plan_copy_all"]}</button>
+      <h3 class="h3 import-h">{t["plan_import_h3"]}</h3>
+      <p class="hint">{t["plan_import_help"]}</p>
+      <pre id="plan-import" class="import"></pre>
+      <p id="plan-import-warn" class="warn-line"></p>
+      <button id="plan-import-copy" class="btn dark" type="button">{t["plan_import_copy"]}</button>
       <h2 class="h3">{t["plan_moments_h2"]}</h2>
       <table class="moments-table">
         <thead><tr><th>{t["plan_col_at"]}</th><th>{t["plan_col_text"]}</th><th>{t["plan_col_carbs"]}</th><th></th></tr></thead>
