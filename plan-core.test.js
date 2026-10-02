@@ -1,7 +1,7 @@
 // plan-core.test.js
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseStepText, formatStep, LIMITS, TEMPLATES, validate, fields, moments, fromJSON, newStep, importSegments } from "./plan-core.js";
+import { parseStepText, formatStep, LIMITS, TEMPLATES, validate, fields, moments, fromJSON, newStep, importSegments, importText, importWarnings } from "./plan-core.js";
 
 const step = (size, repeat, text, carbs, caf, abs = false) => ({ size, repeat, text, carbs, caf, abs });
 const dashes = (n) => Array(n).fill("-");
@@ -220,4 +220,15 @@ test("validate: warns when the text is too long to read on the watch", () => {
   const v = validate(sched("km", [step(5, 1, "Gel number 3 is great", 25, false), step(5, 1, "Peanut butter 1", 25, false), step(5, 1, "Gel", 25, false)]));
   assert.deepEqual(v.warnings, ["text_long", null, null]); // 21 chars warns, 15 does not
   assert.equal(v.ok, true);
+});
+
+test("import text: one segment per line, warnings for ; and length", () => {
+  const s = sched("km", [step(5, 1, "Gel", 25, false)], "Run");
+  assert.equal(importText(s), "Run;\nkm;\n5 Gel 25g");
+  assert.deepEqual(importWarnings(s), []);
+  // a ; inside the name or a step text would split the import on the watch
+  assert.deepEqual(importWarnings(sched("km", [step(5, 1, "Gel", 25, false)], "Run; A")), ["semicolon"]);
+  assert.deepEqual(importWarnings(sched("km", [step(5, 1, "Gel;Iso", 25, false)])), ["semicolon"]);
+  const long = sched("km", Array(12).fill(step(5, 1, "Maurten Gel 100 CAF", 25, true)), "Long name here");
+  assert.deepEqual(importWarnings(long), ["long"]);
 });

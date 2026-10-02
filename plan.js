@@ -1,6 +1,6 @@
 // plan.js — DOM layer of the plan builder. All logic lives in plan-core.js; this file renders state,
 // copies values, keeps the schedule in localStorage and sends Umami events (names only, no schedule contents).
-import { LIMITS, TEMPLATES, validate, fields, moments, fromJSON, newStep, importSegments } from "./plan-core.js";
+import { LIMITS, TEMPLATES, validate, fields, moments, fromJSON, newStep, importText, importWarnings } from "./plan-core.js";
 
 const STORAGE = "fuelsteps-plan";
 const S = JSON.parse(document.getElementById("plan-i18n").textContent);
@@ -186,13 +186,10 @@ function renderFields() {
   }
 }
 
-// the Import field: one segment per line so people can read it; the ";" keeps it valid if Garmin Connect drops the line breaks
-const importText = () => importSegments(schedule).join(";\n");
-
 function renderImport() {
-  const text = importText();
-  $("plan-import").textContent = text;
-  $("plan-import-warn").textContent = text.length > LIMITS.importMax ? fmt(S.warn_import_long, { max: LIMITS.importMax }) : "";
+  $("plan-import").textContent = importText(schedule);
+  const warn = { semicolon: S.warn_import_semicolon, long: fmt(S.warn_import_long, { max: LIMITS.importMax }) };
+  $("plan-import-warn").textContent = importWarnings(schedule).map((w) => warn[w]).join(" ");
 }
 
 function renderMoments() {
@@ -247,7 +244,7 @@ $("plan-copy-all").addEventListener("click", (e) => {
   track("plan_copy_all", { unit: schedule.unit, steps: schedule.steps.length, moments: m.count, caf: m.cafCount, total_g: m.totalCarbs });
 });
 $("plan-import-copy").addEventListener("click", (e) => {
-  const text = importText();
+  const text = importText(schedule);
   copyText(text, e.currentTarget);
   track("plan_copy_import", { unit: schedule.unit, steps: schedule.steps.length, len: text.length });
 });

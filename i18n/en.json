@@ -100,6 +100,7 @@
   "plan_import_help": "Paste this into the Import field of a schedule in the Connect IQ app (the first field of the schedule). It replaces the name, unit and step fields.",
   "plan_import_copy": "Copy import text",
   "plan_warn_import_long": "Longer than {max} characters: Garmin Connect may cut it off. Shorten the step names or use the separate fields.",
+  "plan_warn_import_semicolon": "A ; in the name or a step splits the import text on the watch; remove it.",
   "plan_moments_h2": "Moments",
   "plan_col_at": "At",
   "plan_before": "before start",

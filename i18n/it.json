@@ -100,6 +100,7 @@
   "plan_import_help": "Incolla questo nel campo Importa di un piano nell'app Connect IQ (il primo campo del piano). Sostituisce nome, unità e passi.",
   "plan_import_copy": "Copia testo di importazione",
   "plan_warn_import_long": "Più di {max} caratteri: Garmin Connect potrebbe tagliarlo. Accorcia i nomi dei passi o usa i campi separati.",
+  "plan_warn_import_semicolon": "Un ; nel nome o in un passo spezza il testo di importazione sull'orologio; toglilo.",
   "plan_moments_h2": "Momenti",
   "plan_col_at": "A",
   "plan_before": "prima della partenza",

@@ -100,6 +100,7 @@
   "plan_import_help": "Plak dit in het veld Importeren van een schema in de Connect IQ-app (het eerste veld van het schema). Het vervangt naam, eenheid en stapvelden.",
   "plan_import_copy": "Kopieer importtekst",
   "plan_warn_import_long": "Langer dan {max} tekens: Garmin Connect kan het afkappen. Maak de stapnamen korter of gebruik de losse velden.",
+  "plan_warn_import_semicolon": "Een ; in de naam of een stap knipt de importtekst op het horloge in stukken; haal hem weg.",
   "plan_moments_h2": "Momenten",
   "plan_col_at": "Bij",
   "plan_before": "voor de start",

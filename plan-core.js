@@ -168,3 +168,16 @@ export function fromJSON(text) {
 export function importSegments(schedule) {
   return [String(schedule.name ?? "").trim(), schedule.unit, ...schedule.steps.map(formatStep)];
 }
+
+// one segment per line so people can read it; the ";" keeps it valid if Garmin Connect drops the line breaks
+export function importText(schedule) {
+  return importSegments(schedule).join(";\n");
+}
+
+// "semicolon": a ; in the name or a step text would split the import on the watch; "long": over the paste limit
+export function importWarnings(schedule) {
+  const out = [];
+  if (importSegments(schedule).some((seg) => seg.includes(";"))) out.push("semicolon");
+  if (importText(schedule).length > LIMITS.importMax) out.push("long");
+  return out;
+}
