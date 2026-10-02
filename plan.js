@@ -55,9 +55,17 @@ function stepInput(type, value, attrs, onChange) {
   return el("input", { type, value, ...attrs, oninput: (e) => { onChange(e.target); render(); } });
 }
 
-// repeat as a picker 1–30 (the watch limit): no typing, nothing to validate
+// "after" = distance/time after the previous moment, "at" = fixed position from the start (written as @21)
+function modeSelect(s) {
+  const sel = el("select", { class: "mode", "aria-label": S.col_mode, onchange: (e) => { s.abs = e.target.value === "at"; if (s.abs) s.repeat = 1; render(true); } },
+    el("option", { value: "after" }, S.opt_after), el("option", { value: "at" }, S.opt_at));
+  sel.value = s.abs ? "at" : "after";
+  return sel;
+}
+
+// repeat as a picker 1–30 (the watch limit): no typing, nothing to validate; a fixed position never repeats
 function repeatSelect(s) {
-  const sel = el("select", { "aria-label": S.col_repeat, onchange: (e) => { s.repeat = Number(e.target.value); render(); } });
+  const sel = el("select", { "aria-label": S.col_repeat, disabled: !!s.abs, onchange: (e) => { s.repeat = Number(e.target.value); render(); } });
   for (let n = 1; n <= LIMITS.repeatMax; n++) sel.append(el("option", { value: n }, String(n)));
   sel.value = String(Number.isInteger(s.repeat) && s.repeat >= 1 && s.repeat <= LIMITS.repeatMax ? s.repeat : 1);
   if (sel.value !== String(s.repeat)) s.repeat = Number(sel.value);
@@ -126,7 +134,7 @@ function renderSteps(v) {
     tr.append(
       handleCell,
       el("td", { class: "rep", "data-label": S.col_repeat }, repeatSelect(s)),
-      el("td", { class: "size", "data-label": S.col_size + " (" + unit + ")" }, stepInput("number", s.size, { min: 0, max: lim.max, step: lim.step, "aria-label": S.col_size + " (" + unit + ")" }, (t) => { s.size = t.valueAsNumber; })),
+      el("td", { class: "size", "data-label": unit }, modeSelect(s), stepInput("number", s.size, { min: 0, max: lim.max, step: lim.step, "aria-label": S.col_mode + " (" + unit + ")" }, (t) => { s.size = t.valueAsNumber; })),
       el("td", { class: "text", "data-label": S.col_text }, stepInput("text", s.text, { maxlength: LIMITS.fieldMax, "aria-label": S.col_text }, (t) => { s.text = t.value; })),
       el("td", { class: "carbs", "data-label": S.col_carbs }, stepInput("number", s.carbs || "", { min: 0, max: LIMITS.carbsMax, step: 1, placeholder: "0", "aria-label": S.col_carbs }, (t) => { s.carbs = Number.isNaN(t.valueAsNumber) ? 0 : t.valueAsNumber; })),
       el("td", { class: "caf", "data-label": S.col_caf }, el("input", { type: "checkbox", checked: s.caf, "aria-label": S.col_caf, onchange: (e) => { s.caf = e.target.checked; render(); } })),
