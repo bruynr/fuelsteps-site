@@ -4,7 +4,8 @@
 export const LIMITS = {
   km: { min: 0.5, max: 100, step: 0.5 },
   min: { min: 5, max: 600, step: 5 },
-  repeatMax: 30, nameMax: 16, fieldMax: 40, maxSteps: 8, carbsMax: 9999,
+  repeatMax: 30, nameMax: 16, fieldMax: 40, maxSteps: 12, carbsMax: 9999,
+  importMax: 256, // practical Garmin Connect paste limit for one text field
   textAdvice: 16, // longer labels are cut off on the watch (alert and field draw the label in one line)
 };
 export const DEFAULT_TEXT = "Gel";
@@ -21,13 +22,13 @@ function parseDecimal(s) {
   return Number(s.replace(",", "."));
 }
 
-// "25" or "25g" → 25 (ScheduleParser.parseCarbs)
+// "25g" → 25; bare numbers are product text, "Gel 100" is a Maurten gel (ScheduleParser.parseCarbs)
 function parseCarbs(s) {
   if (s.length > 1 && /[gG]$/.test(s)) return parseWhole(s.slice(0, -1));
-  return parseWhole(s);
+  return null;
 }
 
-// "[repeat]x size [text] [carbs[g]] [caf]" → step or null
+// "[repeat]x size [text] [carbsg] [caf]" or "@position [text] [carbsg] [caf]" → step or null
 export function parseStepText(raw) {
   if (typeof raw !== "string") return null;
   const tokens = raw.split(/[ \t\r\n]+/).filter(Boolean);
@@ -35,7 +36,9 @@ export function parseStepText(raw) {
   const first = tokens[0];
   let repeat = 1;
   let sizeText = first;
-  const xs = first.match(/[xX]/g) || [];
+  const abs = first[0] === "@";
+  if (abs) sizeText = first.slice(1); // no repeat prefix: parseDecimal rejects "x"
+  const xs = abs ? [] : first.match(/[xX]/g) || [];
   if (xs.length > 1) return null;
   if (xs.length === 1) {
     const pos = first.search(/[xX]/);
@@ -54,23 +57,23 @@ export function parseStepText(raw) {
     if (c !== null) { carbs = c; last--; }
   }
   const text = tokens.slice(1, last + 1).join(" ") || DEFAULT_TEXT;
-  return { size, repeat, text, carbs, caf };
+  return { size, repeat, text, carbs, caf, abs };
 }
 
 function num(n) {
   return Number.isFinite(n) ? String(Math.round(n * 100) / 100) : "?"; // 7.5 → "7.5", 5 → "5", empty field → "?"
 }
 
-// step → canonical field text: repeat omitted when 1, carbs omitted when 0, text always written
+// step → canonical field text: repeat omitted when 1 (never with @), carbs omitted when 0, text always written
 export function formatStep(step) {
   const text = String(step.text || "").trim().split(/\s+/).filter(Boolean).join(" ") || DEFAULT_TEXT;
-  const parts = [(step.repeat > 1 ? step.repeat + "x" : "") + num(step.size), text];
-  if (step.carbs > 0) parts.push(String(step.carbs));
+  const parts = [(step.abs ? "@" : step.repeat > 1 ? step.repeat + "x" : "") + num(step.size), text];
+  if (step.carbs > 0) parts.push(step.carbs + "g");
   if (step.caf) parts.push("caf");
   return parts.join(" ");
 }
 
-const mk = (size, repeat, text, carbs, caf) => ({ size, repeat, text, carbs, caf });
+const mk = (size, repeat, text, carbs, caf, abs = false) => ({ size, repeat, text, carbs, caf, abs });
 
 export function newStep() {
   return mk(5, 1, DEFAULT_TEXT, 25, false);
@@ -97,8 +100,10 @@ export function validate(schedule) {
   let total = 0;
   schedule.steps.forEach((s, i) => {
     let err = null;
-    const size = Number(s.size);
+    const size = s.abs ? Number(s.size) - total : Number(s.size); // an absolute position becomes the step after the previous moment
     if (!isInt(s.repeat) || s.repeat < 1 || s.repeat > LIMITS.repeatMax) err = "repeat";
+    else if (s.abs && s.repeat !== 1) err = "abs_repeat";
+    else if (s.abs && i > 0 && !(size >= lim.min)) err = "abs_back";
     else if (size === 0 && (i > 0 || s.repeat > 1)) err = "zero_first";
     else if (size !== 0 && !(size >= lim.min)) err = "size_min";
     else if (!isInt(s.carbs) || s.carbs < 0 || s.carbs > LIMITS.carbsMax) err = "carbs";
@@ -111,7 +116,7 @@ export function validate(schedule) {
     let warn = null;
     if (!err) {
       const back = parseStepText(formatStep(s));
-      // the watch would read the text differently (last word eaten as carbs, or as the caf flag)
+      // the watch would read the text differently (last word eaten as grams, or as the caf flag)
       if (!back || back.text !== normText(s.text) || back.carbs !== s.carbs || back.caf !== !!s.caf) warn = "roundtrip";
       else if (normText(s.text).length > LIMITS.textAdvice) warn = "text_long";
     }
@@ -121,7 +126,7 @@ export function validate(schedule) {
   return { ok, name: nameErr, steps, warnings };
 }
 
-// the 10 Garmin Connect fields: name, unit, step 1-8 ("-" when unused)
+// the 14 Garmin Connect fields: name, unit, step 1-12 ("-" when unused)
 export function fields(schedule) {
   const steps = schedule.steps.slice(0, LIMITS.maxSteps).map(formatStep);
   while (steps.length < LIMITS.maxSteps) steps.push("-");
@@ -139,7 +144,7 @@ export function moments(schedule) {
     if (!runnable(s)) return;
     const text = normText(s.text);
     for (let n = 1; n <= s.repeat; n++) {
-      at = Math.round((at + Number(s.size)) * 1000) / 1000;
+      at = s.abs ? Number(s.size) : Math.round((at + Number(s.size)) * 1000) / 1000;
       rows.push({ at, label: s.repeat > 1 ? `${text} #${n}` : text, carbs: s.carbs, caf: !!s.caf, before: i === 0 && Number(s.size) === 0 });
       totalCarbs += s.carbs;
       if (s.caf) cafCount++;
@@ -149,12 +154,17 @@ export function moments(schedule) {
   return { rows, totalCarbs, count: rows.length, cafCount, perHour };
 }
 
-// localStorage → schedule; null unless it looks like one (max 8 steps, coerced numbers)
+// localStorage → schedule; null unless it looks like one (max 12 steps, coerced numbers; abs false when saved before v2)
 export function fromJSON(text) {
   let o;
   try { o = JSON.parse(text); } catch { return null; }
   if (!o || typeof o !== "object" || Array.isArray(o)) return null;
   if (typeof o.name !== "string" || !(o.unit in LIMITS) || !Array.isArray(o.steps)) return null;
-  const steps = o.steps.slice(0, LIMITS.maxSteps).map(s => mk(Number(s?.size), Number(s?.repeat), String(s?.text ?? DEFAULT_TEXT), Number(s?.carbs), Boolean(s?.caf)));
+  const steps = o.steps.slice(0, LIMITS.maxSteps).map(s => mk(Number(s?.size), Number(s?.repeat), String(s?.text ?? DEFAULT_TEXT), Number(s?.carbs), Boolean(s?.caf), Boolean(s?.abs)));
   return { name: o.name, unit: o.unit, steps };
+}
+
+// the Import field: the whole schedule in one paste, [name, unit, ...step lines]; joined with ";" (the app also accepts newlines)
+export function importSegments(schedule) {
+  return [String(schedule.name ?? "").trim(), schedule.unit, ...schedule.steps.map(formatStep)];
 }
