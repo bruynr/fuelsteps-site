@@ -491,7 +491,7 @@ def llms():
 - Price: free, no subscription, no ads, no account; donations: {PLAIN_DONATE}
 - Watches: round Garmin watches with Connect IQ 5.0+ (Forerunner 165–970, fēnix 7/8/9/E, epix Gen 2/Pro, Enduro 3, MARQ Gen 2, Venu 2/3/4, vívoactive 5/6)
 - Schedules: up to 5, each a chain of steps by distance (km) or time (min) with repeats; per step a name, grams of carbs and a caffeine mark
-- Settings format (Garmin Connect, per schedule: Name, Unit, Step 1–8): one step field = `[Nx] size [text] [carbs[g]] [caf]`, e.g. `3x5 Gel 25 caf`; unused fields `-`; full reference and plan builder: {BASE}plan/#format
+- Settings format (Garmin Connect, per schedule: Import, Name, Unit, Step 1–12): one step field = `[Nx] size [text] [carbsg] [caf]` or `@position [text] [carbsg] [caf]`, e.g. `3x5 Gel 25g caf`, `@21 Gel 25g`; grams always with `g`; unused fields `-`; or the whole schedule in Import as `name;km|min;step;step;…`; full reference and plan builder: {BASE}plan/#format
 - Alert: vibration, tone and full screen, 30 s / 50 m before the planned moment by default
 - Data: planned carbs, carbs per hour, fuel and caffeine moments saved in the activity (Garmin Connect charts)
 - Languages: English, Dutch, German, French, Spanish, Italian
