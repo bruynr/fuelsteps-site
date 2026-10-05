@@ -1,6 +1,6 @@
 // plan.js — DOM layer of the plan builder. All logic lives in plan-core.js; this file renders state,
 // copies values, keeps the schedule in localStorage and sends Umami events (names only, no schedule contents).
-import { LIMITS, TEMPLATES, validate, fields, moments, fromJSON, newStep, importText, importWarnings } from "./plan-core.js";
+import { LIMITS, TEMPLATES, validate, fields, moments, fromJSON, newStep, importText, importWarnings, parseImport } from "./plan-core.js";
 
 const STORAGE = "fuelsteps-plan";
 const S = JSON.parse(document.getElementById("plan-i18n").textContent);
@@ -247,6 +247,20 @@ $("plan-import-copy").addEventListener("click", (e) => {
   const text = importText(schedule);
   copyText(text, e.currentTarget);
   track("plan_copy_import", { unit: schedule.unit, steps: schedule.steps.length, len: text.length });
+});
+$("plan-ai-copy").addEventListener("click", (e) => {
+  copyText($("plan-ai-prompt").textContent, e.currentTarget);
+  track("plan_copy_prompt", {});
+});
+// an import text from an AI assistant (or typed) replaces the schedule, so the moments table checks it
+$("plan-ai-load").addEventListener("click", () => {
+  const parsed = parseImport($("plan-ai-paste").value);
+  $("plan-ai-msg").textContent = parsed ? "" : S.ai_load_bad;
+  track("plan_load_import", { ok: !!parsed });
+  if (!parsed) return;
+  schedule = parsed;
+  render(true);
+  $("plan-name").scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
 render();

@@ -1,7 +1,7 @@
 // plan-core.test.js
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseStepText, formatStep, LIMITS, TEMPLATES, validate, fields, moments, fromJSON, newStep, importSegments, importText, importWarnings } from "./plan-core.js";
+import { parseStepText, formatStep, LIMITS, TEMPLATES, validate, fields, moments, fromJSON, newStep, importSegments, importText, importWarnings, parseImport } from "./plan-core.js";
 
 const step = (size, repeat, text, carbs, caf, abs = false) => ({ size, repeat, text, carbs, caf, abs });
 const dashes = (n) => Array(n).fill("-");
@@ -231,4 +231,22 @@ test("import text: one segment per line, warnings for ; and length", () => {
   assert.deepEqual(importWarnings(sched("km", [step(5, 1, "Gel;Iso", 25, false)])), ["semicolon"]);
   const long = sched("km", Array(12).fill(step(5, 1, "Maurten Gel 100 CAF", 25, true)), "Long name here");
   assert.deepEqual(importWarnings(long), ["long"]);
+});
+
+test("parseImport: name;unit;steps, ; or newline separated, spaces trimmed", () => {
+  const s = parseImport("Long run; km ;0 Gel 25g;10 Gel 25g\n2x5 Gel 25g caf");
+  assert.deepEqual(s, { name: "Long run", unit: "km", steps: [step(0, 1, "Gel", 25, false), step(10, 1, "Gel", 25, false), step(5, 2, "Gel", 25, true)] });
+  assert.equal(parseImport("Marathon;min;3x30 Gel 100 25g;").steps.length, 1); // trailing ; ignored
+});
+
+test("parseImport: @ steps keep their absolute position", () => {
+  assert.deepEqual(parseImport("M;km;@21 Dextro 15g").steps, [step(21, 1, "Dextro", 15, false, true)]);
+});
+
+test("parseImport: null when it isn't an import text", () => {
+  assert.equal(parseImport(""), null);
+  assert.equal(parseImport("3x5 Gel 25g caf"), null); // a single step field, no header
+  assert.equal(parseImport("Run;miles;5 Gel"), null);
+  assert.equal(parseImport("Run;km;kapot"), null);
+  assert.equal(parseImport("Run;km"), null);
 });

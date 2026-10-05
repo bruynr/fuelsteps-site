@@ -174,6 +174,18 @@ export function importText(schedule) {
   return importSegments(schedule).join(";\n");
 }
 
+// import text (from the builder, an AI assistant or typed) → schedule, or null when it isn't one:
+// "name;km|min;step;step;…", ; or newline separated, each step as parseStepText reads it
+export function parseImport(text) {
+  if (typeof text !== "string") return null;
+  const segs = text.split(/[;\n]/).map((s) => s.trim());
+  while (segs.length && segs[segs.length - 1] === "") segs.pop();
+  if (segs.length < 3 || !(segs[1] in LIMITS)) return null;
+  const steps = segs.slice(2, 2 + LIMITS.maxSteps).map(parseStepText);
+  if (steps.some((s) => s === null)) return null;
+  return { name: segs[0], unit: segs[1], steps };
+}
+
 // "semicolon": a ; in the name or a step text would split the import on the watch; "long": over the paste limit
 export function importWarnings(schedule) {
   const out = [];

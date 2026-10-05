@@ -135,7 +135,23 @@ body.dragging, body.dragging * { user-select: none; -webkit-user-select: none; c
 .format .note-h { margin-top: 54px; padding-top: 28px; border-top: 1px solid #e7e1d3; font-size: 18px; color: var(--amber-dark); }
 .format .note { font-size: 16px; }
 .examples td:first-child { white-space: nowrap; width: 230px; }
+.lead-link { margin-top: 14px; font-size: 18px; } .lead-link a { font-weight: 700; }
+.fields-details { margin-top: 28px; border-top: 1px solid #e7e1d3; padding-top: 14px; }
+.fields-details summary { font-weight: 700; cursor: pointer; color: var(--muted); font-size: 16px; }
+.fields-details .hint { margin-top: 12px; }
+/* "already have a plan": prompt for an AI assistant, plan → import-text examples, and a paste box to check the answer */
+.ai .lead { max-width: 640px; }
+.ai-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: start; margin-top: 30px; }
+.ai-grid > * { min-width: 0; }
+.prompt { font-family: inherit; font-size: 17px; line-height: 1.5; }
+.pairs { list-style: none; padding: 0; margin: 0; }
+.pairs li { display: grid; grid-template-columns: 1fr 24px 1fr; gap: 10px; align-items: center; padding: 12px 0; border-top: 1px solid #e7e1d3; font-size: 16px; }
+.pairs .in { color: var(--muted); } .pairs .arrow { color: var(--amber-dark); font-weight: 800; text-align: center; }
+.pairs code { font-family: ui-monospace, Consolas, "Cascadia Mono", monospace; font-size: 14px; background: #fff; border: 1px solid #e7e1d3; border-radius: 6px; padding: 6px 10px; overflow-wrap: anywhere; }
+.paste { display: block; width: 100%; font-family: ui-monospace, Consolas, "Cascadia Mono", monospace; font-size: 15px; line-height: 1.5; padding: 10px 12px; border: 1px solid #d9d2c3; border-radius: 10px; background: #fff; margin: 0 0 8px; resize: vertical; }
 @media (max-width: 820px) {
+  .ai-grid { grid-template-columns: 1fr; }
+  .pairs li { grid-template-columns: 1fr; gap: 6px; } .pairs .arrow { text-align: left; }
   .builder-grid { grid-template-columns: 1fr; } .field-row { grid-template-columns: 1fr; }
   .steps-table thead { display: none; } .steps-table, .steps-table tbody { display: block; width: 100%; }
   .steps-table tr { display: grid; grid-template-columns: 44px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 60px; grid-template-areas: 'handle text text text del' 'handle rep size carbs caf'; gap: 6px 10px; padding: 10px 0; border-top: 1px solid #eee; }

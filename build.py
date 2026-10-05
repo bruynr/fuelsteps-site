@@ -395,6 +395,7 @@ def plan(code):
   <div class="kicker">{t["plan_kicker"]}</div>
   <h1>{t["plan_h1"]}</h1>
   <p class="lead">{t["plan_lead"]}</p>
+  <p class="lead-link"><a href="#ai">{t["plan_lead_ai"]}</a></p>
 </div></section>
 
 <section class="builder"><div class="wrap">
@@ -418,21 +419,44 @@ def plan(code):
       <ul id="plan-errors" class="errors"></ul>
     </div>
     <div class="builder-out">
-      <h2 class="h3">{t["plan_fields_h2"]}</h2>
-      <p class="hint">{t["plan_fields_lead"]}</p>
-      <ol id="plan-fields" class="fields"></ol>
-      <button id="plan-copy-all" class="btn amber" type="button">{t["plan_copy_all"]}</button>
-      <h3 class="h3 import-h">{t["plan_import_h3"]}</h3>
-      <p class="hint">{t["plan_import_help"]}</p>
-      <pre id="plan-import" class="import"></pre>
-      <p id="plan-import-warn" class="warn-line"></p>
-      <button id="plan-import-copy" class="btn dark" type="button">{t["plan_import_copy"]}</button>
       <h2 class="h3">{t["plan_moments_h2"]}</h2>
       <table class="moments-table">
         <thead><tr><th>{t["plan_col_at"]}</th><th>{t["plan_col_text"]}</th><th>{t["plan_col_carbs"]}</th><th></th></tr></thead>
         <tbody id="plan-moments"></tbody>
       </table>
       <p id="plan-totals" class="totals"></p>
+      <h2 class="h3 import-h">{t["plan_import_h2"]}</h2>
+      <p class="hint">{t["plan_import_help"]}</p>
+      <pre id="plan-import" class="import"></pre>
+      <p id="plan-import-warn" class="warn-line"></p>
+      <button id="plan-import-copy" class="btn amber" type="button">{t["plan_import_copy"]}</button>
+      <details class="fields-details">
+        <summary>{t["plan_fields_details"]}</summary>
+        <p class="hint">{t["plan_fields_lead"]}</p>
+        <ol id="plan-fields" class="fields"></ol>
+        <button id="plan-copy-all" class="btn dark" type="button">{t["plan_copy_all"]}</button>
+      </details>
+    </div>
+  </div>
+</div></section>
+
+<section class="alt ai" id="ai"><div class="wrap">
+  <div class="kicker">{t["plan_ai_kicker"]}</div>
+  <h2>{t["plan_ai_h2"]}</h2>
+  <p class="lead">{t["plan_ai_lead"]}</p>
+  <div class="ai-grid">
+    <div>
+      <pre id="plan-ai-prompt" class="import prompt">{esc(t["plan_ai_prompt"])}</pre>
+      <button id="plan-ai-copy" class="btn dark" type="button">{t["plan_ai_copy"]}</button>
+      <h3 class="h3">{t["plan_ai_examples_h3"]}</h3>
+      <ul class="pairs">{"".join(f'<li><span class="in">{esc(a)}</span><span class="arrow" aria-hidden="true">→</span><code>{esc(b)}</code></li>' for a, b in t["plan_ai_examples"])}</ul>
+    </div>
+    <div>
+      <h3 class="h3">{t["plan_ai_paste_h3"]}</h3>
+      <p class="hint">{t["plan_ai_paste_help"]}</p>
+      <textarea id="plan-ai-paste" class="paste" rows="5" spellcheck="false" placeholder="{esc(t["plan_ai_examples"][2][1])}"></textarea>
+      <p id="plan-ai-msg" class="warn-line"></p>
+      <button id="plan-ai-load" class="btn amber" type="button">{t["plan_ai_load"]}</button>
     </div>
   </div>
 </div></section>
@@ -492,7 +516,8 @@ def llms():
 - Watches: round Garmin watches with Connect IQ 5.0+ (Forerunner 165–970, fēnix 7/8/9/E, epix Gen 2/Pro, Enduro 3, MARQ Gen 2, Venu 2/3/4, vívoactive 5/6)
 - Schedules: up to 5, each a chain of steps by distance (km) or time (min) with repeats; per step a name, grams of carbs and a caffeine mark
 - Settings format (Garmin Connect, per schedule: Import, Name, Unit, Step 1–12): one step field = `[Nx] size [text] [carbsg] [caf]` or `@position [text] [carbsg] [caf]`, e.g. `3x5 Gel 25g caf`, `@21 Gel 25g`; grams always with `g`; unused fields `-`; or the whole schedule in Import as `name;km|min;step;step;…`; full reference and plan builder: {BASE}plan/#format
-- Alert: vibration, tone and full screen, 30 s / 50 m before the planned moment by default
+- Alert: vibration, tone and full screen, 60 s / 150 m before the planned moment by default; afterwards the field keeps showing the last moment ("Gel · now", then "Gel · km 20")
+- Converting an existing plan (Maurten planner, coach, book): paste it into an AI assistant with the prompt on {BASE}plan/#ai; the builder can load the resulting import text to check the moments
 - Data: planned carbs, carbs per hour, fuel and caffeine moments saved in the activity (Garmin Connect charts)
 - Languages: English, Dutch, German, French, Spanish, Italian
 
