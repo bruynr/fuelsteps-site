@@ -118,6 +118,7 @@ export function validate(schedule) {
       const back = parseStepText(formatStep(s));
       // the watch would read the text differently (last word eaten as grams, or as the caf flag)
       if (!back || back.text !== normText(s.text) || back.carbs !== s.carbs || back.caf !== !!s.caf) warn = "roundtrip";
+      else if (s.carbs === 0 && /^[0-9]+$/.test(normText(s.text).split(" ").pop())) warn = "bare_number"; // "Gel 25" with 0 g probably meant 25g ("Gel 100" is a product, so a hint, not an error)
       else if (normText(s.text).length > LIMITS.textAdvice) warn = "text_long";
     }
     warnings.push(warn);
@@ -175,11 +176,10 @@ export function importText(schedule) {
 }
 
 // import text (from the builder, an AI assistant or typed) → schedule, or null when it isn't one:
-// "name;km|min;step;step;…", ; or newline separated, each step as parseStepText reads it
+// "name;km|min;step;step;…", separated by ; and/or line breaks (also ";\n" and "\r\n"); blank segments are skipped, like the watch does
 export function parseImport(text) {
   if (typeof text !== "string") return null;
-  const segs = text.split(/[;\n]/).map((s) => s.trim());
-  while (segs.length && segs[segs.length - 1] === "") segs.pop();
+  const segs = text.split(/[;\r\n]/).map((s) => s.trim()).filter(Boolean);
   if (segs.length < 3 || !(segs[1] in LIMITS)) return null;
   const steps = segs.slice(2, 2 + LIMITS.maxSteps).map(parseStepText);
   if (steps.some((s) => s === null)) return null;
