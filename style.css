@@ -53,18 +53,16 @@ ul.checks li::before { content: ""; position: absolute; left: 4px; top: 15px; wi
 ol.steps { margin-top: 24px; padding-left: 22px; font-size: 19px; color: var(--muted); } ol.steps li { padding: 6px 0; }
 .start ol.steps { max-width: 820px; }
 /* "after your run": Garmin Connect look-alike, charts (SVG) and the Connect IQ summary panel */
-.connect { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; margin-top: 34px; }
-.panel { background: #fff; border-radius: 16px; box-shadow: 0 6px 20px rgba(40, 30, 0, .06); padding: 18px 20px; }
-.chart-title { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: #333; margin: 6px 0 4px; }
-.chart-title + .chart-title, .chart + .chart-title { margin-top: 18px; }
-.chart-title small, .stat small { font-size: 11px; color: #999; font-weight: 600; letter-spacing: .5px; }
-.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; } .dot.amber { background: var(--amber); } .dot.blue { background: var(--blue); }
+.connect { display: grid; grid-template-columns: 1fr 240px; gap: 18px; align-items: start; margin-top: 30px; max-width: 900px; }
+.panel { background: #fff; border-radius: 14px; box-shadow: 0 6px 20px rgba(40, 30, 0, .06); padding: 14px 16px; }
+.chart-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #333; margin: 2px 0 2px; }
+.chart + .chart-title { margin-top: 12px; }
+.chart-title small, .stat small { font-size: 10px; color: #999; font-weight: 600; letter-spacing: .5px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; } .dot.amber { background: var(--amber); } .dot.blue { background: var(--blue); }
 .chart { width: 100%; height: auto; display: block; }
-.chart .grid line { stroke: #e6e6e6; stroke-width: 1; } .chart .lbl text { font: 11px "Segoe UI", system-ui, sans-serif; fill: #777; }
-.chart .amber { fill: var(--amber); } .chart .blue { fill: var(--blue); }
-.summary .sum-h { font-size: 14px; color: #666; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 4px; }
-.stat { padding: 11px 0; } .stat b { display: block; font-size: 24px; font-weight: 700; letter-spacing: -.3px; } .stat span { font-size: 14px; color: #666; }
-.stat:first-of-type b { color: var(--blue); }
+.summary .sum-h { font-size: 13px; color: #666; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 2px; }
+.stat { padding: 7px 0; } .stat .v { font-size: 20px; font-weight: 700; letter-spacing: -.3px; } .stat .l { font-size: 13px; color: #666; }
+.stat:first-of-type .v { color: var(--blue); }
 .connect + ul.checks { margin-top: 30px; }
 @media (max-width: 820px) { .connect { grid-template-columns: 1fr; } }
 .donate { background: var(--ink); color: #fff; text-align: center; }
