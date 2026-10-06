@@ -105,6 +105,49 @@ def pic(up, name, alt, sizes, lazy=True, cls=""):
     return f'<img{c} src="{up}{WEB}{name}-480.webp" srcset="{srcset}" sizes="{sizes}" alt="{esc(alt)}" width="{w}" height="{h}"{extra}>'
 
 
+# Garmin Connect charts of the marathon demo schedule as inline SVG: gel at the start and every 7 km at 5:00/km,
+# so moments at 0, 35, ... 175 min, run of 3:30. Same data as the schedule card and the summary panel.
+DEMO_MOMENTS = [(0, 25), (35, 25), (70, 15), (105, 25), (140, 25), (175, 25)]  # (minute, grams)
+DEMO_END = 210
+DEMO_TOTAL = sum(g for _, g in DEMO_MOMENTS)
+CH_W, CH_H, CH_L, CH_B, CH_T = 560, 150, 34, 22, 8  # width, height, left/bottom/top margins
+
+
+def chart_frame(y_max, y_ticks, body):
+    x = lambda m: CH_L + (CH_W - CH_L - 6) * m / DEMO_END
+    y = lambda v: CH_T + (CH_H - CH_T - CH_B) * (1 - v / y_max)
+    grid = "".join(f'<line x1="{CH_L}" x2="{CH_W - 6}" y1="{y(v):.1f}" y2="{y(v):.1f}"/>' for v in y_ticks)
+    ylab = "".join(f'<text x="{CH_L - 6}" y="{y(v) + 4:.1f}" text-anchor="end">{v}</text>' for v in y_ticks)
+    xlab = "".join(f'<text x="{x(m):.1f}" y="{CH_H - 6}" text-anchor="middle">{m // 60}:{m % 60:02d}</text>' for m in range(30, DEMO_END, 30))
+    return (f'<svg class="chart" viewBox="0 0 {CH_W} {CH_H}" role="img" aria-hidden="true">'
+            f'<g class="grid">{grid}</g>{body(x, y)}<g class="lbl">{ylab}{xlab}</g></svg>')
+
+
+def chart_carbs():
+    def body(x, y):
+        pts, total = [], 0
+        for m, g in DEMO_MOMENTS:
+            if total:
+                pts.append(f"{x(m):.1f},{y(total):.1f}")
+            total += g
+            pts.append(f"{x(m):.1f},{y(total):.1f}")
+        pts.append(f"{x(DEMO_END):.1f},{y(total):.1f}")
+        return f'<polygon class="amber" points="{x(0):.1f},{y(0):.1f} {" ".join(pts)} {x(DEMO_END):.1f},{y(0):.1f}"/>'
+    return chart_frame(200, [0, 100, 200], body)
+
+
+def chart_rate():
+    def body(x, y):
+        pts, total, i = [], 0, 0
+        for m in range(1, DEMO_END + 1):
+            while i < len(DEMO_MOMENTS) and DEMO_MOMENTS[i][0] <= m:
+                total += DEMO_MOMENTS[i][1]
+                i += 1
+            pts.append(f"{x(m):.1f},{y(min(100, total * 60 / m)):.1f}")
+        return f'<polygon class="blue" points="{x(1):.1f},{y(0):.1f} {" ".join(pts)} {x(DEMO_END):.1f},{y(0):.1f}"/>'
+    return chart_frame(100, [0, 50, 100], body)
+
+
 def strip(s):
     return re.sub(r"<[^>]+>", "", s.replace("<br>", " "))
 
@@ -277,20 +320,35 @@ def page(code):
   </div>
 </div></section>
 
-<section><div class="wrap split">
-  <div>
-    <div class="kicker">{t["start_kicker"]}</div>
-    <h2>{t["start_h2"]}</h2>
-    <ol class="steps">{li(t["steps"])}</ol>
-  </div>
-  <div>
-    <div class="kicker">{t["after_kicker"]}</div>
-    <h2>{t["after_h2"]}</h2>
-    <ul class="checks">{li(t["after_li"])}</ul>
-  </div>
+<section><div class="wrap start">
+  <div class="kicker">{t["start_kicker"]}</div>
+  <h2>{t["start_h2"]}</h2>
+  <ol class="steps">{li(t["steps"])}</ol>
 </div></section>
 
 <section class="alt"><div class="wrap">
+  <div class="kicker">{t["after_kicker"]}</div>
+  <h2>{t["after_h2"]}</h2>
+  <p class="lead">{t["after_lead"]}</p>
+  <div class="connect">
+    <div class="panel charts">
+      <div class="chart-title"><span class="dot amber"></span>{t["fit_carbs"]} <small>IQ</small></div>
+      {chart_carbs()}
+      <div class="chart-title"><span class="dot blue"></span>{t["fit_rate"]} <small>IQ</small></div>
+      {chart_rate()}
+    </div>
+    <div class="panel summary">
+      <div class="sum-h">Connect IQ™</div>
+      <div class="stat"><b>{t["fit_card_name"]}</b><span>{t["fit_schedule"]} <small>IQ</small></span></div>
+      <div class="stat"><b>{DEMO_TOTAL} g</b><span>{t["fit_total"]} <small>IQ</small></span></div>
+      <div class="stat"><b>{len(DEMO_MOMENTS)} x</b><span>{t["fit_count"]} <small>IQ</small></span></div>
+      <div class="stat"><b>1 x</b><span>{t["fit_caf"]} <small>IQ</small></span></div>
+    </div>
+  </div>
+  <ul class="checks">{li(t["after_li"])}</ul>
+</div></section>
+
+<section><div class="wrap">
   <div style="text-align: center;">
     <div class="kicker">{t["faq_kicker"]}</div>
     <h2>{t["faq_h2"]}</h2>
@@ -624,6 +682,8 @@ Example schedule ({t["card_title"]}):
 {chr(10).join(f"{i + 1}. {strip(s)}" for i, s in enumerate(t["steps"]))}
 
 ## {strip(t["after_h2"])}
+{strip(t["after_lead"])}
+
 {bullets(t["after_li"])}
 
 ## FAQ
