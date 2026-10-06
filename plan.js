@@ -81,7 +81,8 @@ function moveStep(from, to) {
   $("plan-steps").querySelectorAll("tr")[to]?.querySelector(".handle button")?.focus();
 }
 
-// drag a row by its handle (mouse, touch, pen); while dragging only the DOM rows move, the schedule changes on release
+// drag a row by its handle (mouse, touch, pen): the row stays where it is in the DOM and a lifted card follows the
+// pointer, an amber line marks the drop spot; the schedule changes on release
 const GRIP_ICON = '<svg viewBox="0 0 14 22" aria-hidden="true"><circle cx="4" cy="4" r="2"/><circle cx="10" cy="4" r="2"/><circle cx="4" cy="11" r="2"/><circle cx="10" cy="11" r="2"/><circle cx="4" cy="18" r="2"/><circle cx="10" cy="18" r="2"/></svg>';
 
 function startDrag(e, tr, handle) {
@@ -94,22 +95,19 @@ function startDrag(e, tr, handle) {
   document.addEventListener("touchmove", stopScroll, { passive: false });
   tr.classList.add("dragging");
   document.body.classList.add("dragging"); // no text selection while a finger or mouse drags the row
-  // the lifted row follows the finger: offset from where the layout put it (recomputed after every DOM swap)
-  const follow = (ev) => {
-    const r = tr.getBoundingClientRect();
-    tr.style.transform = `translateY(${ev.clientY - (r.top + r.height / 2)}px)`;
-  };
-  tr.style.transform = "";
-  follow(e);
+  const start = tr.getBoundingClientRect();
+  const startY = start.top + start.height / 2;
+  let to = from;
+  const clearMarks = () => body.querySelectorAll(".drop-before, .drop-after").forEach((r) => r.classList.remove("drop-before", "drop-after"));
   const move = (ev) => {
     if (ev.pointerId !== e.pointerId) return;
-    const rows = [...body.children];
-    const over = rows.find((r) => r !== tr && ev.clientY >= r.getBoundingClientRect().top && ev.clientY <= r.getBoundingClientRect().bottom);
-    if (over) {
-      const before = ev.clientY < over.getBoundingClientRect().top + over.getBoundingClientRect().height / 2;
-      body.insertBefore(tr, before ? over : over.nextSibling);
-    }
-    follow(ev);
+    tr.style.transform = `translateY(${ev.clientY - startY}px)`;
+    // drop spot: before the first other row whose middle lies below the pointer, else after the last one
+    const rows = [...body.children].filter((r) => r !== tr);
+    const target = rows.findIndex((r) => { const b = r.getBoundingClientRect(); return ev.clientY < b.top + b.height / 2; });
+    clearMarks();
+    if (target < 0) { to = rows.length; rows[rows.length - 1]?.classList.add("drop-after"); } else { to = target; rows[target].classList.add("drop-before"); }
+    if (to === from) clearMarks(); // back on its own spot: no line
   };
   const end = (ev) => {
     if (ev.pointerId !== e.pointerId) return;
@@ -120,8 +118,8 @@ function startDrag(e, tr, handle) {
     tr.classList.remove("dragging");
     tr.style.transform = "";
     document.body.classList.remove("dragging");
-    const to = [...body.children].indexOf(tr);
-    if (to !== from) moveStep(from, to); else render(true);
+    clearMarks();
+    if (ev.type !== "pointercancel" && to !== from) moveStep(from, to); else render(true);
   };
   document.addEventListener("pointermove", move);
   document.addEventListener("pointerup", end);
