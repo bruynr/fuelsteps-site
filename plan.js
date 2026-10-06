@@ -94,13 +94,22 @@ function startDrag(e, tr, handle) {
   document.addEventListener("touchmove", stopScroll, { passive: false });
   tr.classList.add("dragging");
   document.body.classList.add("dragging"); // no text selection while a finger or mouse drags the row
+  // the lifted row follows the finger: offset from where the layout put it (recomputed after every DOM swap)
+  const follow = (ev) => {
+    const r = tr.getBoundingClientRect();
+    tr.style.transform = `translateY(${ev.clientY - (r.top + r.height / 2)}px)`;
+  };
+  tr.style.transform = "";
+  follow(e);
   const move = (ev) => {
     if (ev.pointerId !== e.pointerId) return;
     const rows = [...body.children];
     const over = rows.find((r) => r !== tr && ev.clientY >= r.getBoundingClientRect().top && ev.clientY <= r.getBoundingClientRect().bottom);
-    if (!over) return;
-    const before = ev.clientY < over.getBoundingClientRect().top + over.getBoundingClientRect().height / 2;
-    body.insertBefore(tr, before ? over : over.nextSibling);
+    if (over) {
+      const before = ev.clientY < over.getBoundingClientRect().top + over.getBoundingClientRect().height / 2;
+      body.insertBefore(tr, before ? over : over.nextSibling);
+    }
+    follow(ev);
   };
   const end = (ev) => {
     if (ev.pointerId !== e.pointerId) return;
@@ -109,6 +118,7 @@ function startDrag(e, tr, handle) {
     document.removeEventListener("pointercancel", end);
     document.removeEventListener("touchmove", stopScroll);
     tr.classList.remove("dragging");
+    tr.style.transform = "";
     document.body.classList.remove("dragging");
     const to = [...body.children].indexOf(tr);
     if (to !== from) moveStep(from, to); else render(true);
