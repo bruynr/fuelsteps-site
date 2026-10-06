@@ -23,6 +23,17 @@ WIDTHS = [320, 480, 960]    # responsive WebP widths
 SHOTS = {"fr970-run": (612, 822), "fr970-alert": (612, 822), "fr970-half": (612, 822), "fr970-quarter": (612, 822),
          "fenix847mm-run": (684, 897), "fenix847mm-almost": (684, 897), "fenix847mm-before": (684, 897)}
 LANG_KEY = "fuelsteps-lang"  # localStorage: language picked in the switcher
+
+
+# cache busting: GitHub Pages serves assets with max-age=600, so a changed style.css or plan.js would show up to
+# 10 minutes late (and mixed with new HTML); a content hash in the query makes every change load at once
+def v(name):
+    import hashlib
+    return hashlib.md5((ROOT / name).read_bytes()).hexdigest()[:8]
+
+
+CSS = f"style.css?v={v('style.css')}"
+PLAN_JS = f"plan.js?v={v('plan.js')}"
 INDEXNOW_KEY = "1d775e9d727f50ad83cd05991cf82236"  # public by design: served as /<key>.txt (Bing, Yandex, …)
 
 # home page only: on the first visit send the visitor to their browser language; a choice in the switcher wins
@@ -233,7 +244,7 @@ def page(code):
 <link rel="apple-touch-icon" href="{up}{WEB}icon-180.png">
 <link rel="manifest" href="{up}manifest.webmanifest">
 {REDIRECT if code == "en" else ""}
-<link rel="stylesheet" href="{up}style.css">
+<link rel="stylesheet" href="{up}{CSS}">
 <script type="application/ld+json">
 {ld(app)}
 </script>
@@ -434,7 +445,7 @@ def plan(code):
 <link rel="icon" href="{up}{WEB}icon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="{up}{WEB}icon-180.png">
 <link rel="manifest" href="{up}manifest.webmanifest">
-<link rel="stylesheet" href="{up}style.css">
+<link rel="stylesheet" href="{up}{CSS}">
 <script type="application/ld+json">
 {json.dumps(webpage, ensure_ascii=False, indent=1)}
 </script>
@@ -548,7 +559,7 @@ def plan(code):
 </div></footer>
 
 <script type="application/json" id="plan-i18n">{json.dumps(ui, ensure_ascii=False)}</script>
-<script type="module" src="{up}plan.js"></script>
+<script type="module" src="{up}{PLAN_JS}"></script>
 {MENU_JS}
 {REMEMBER}
 </body>
@@ -613,7 +624,7 @@ def not_found():
 <title>Page not found · FuelSteps</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="{BASE}{WEB}icon-32.png" sizes="32x32" type="image/png">
-<link rel="stylesheet" href="{BASE}style.css">
+<link rel="stylesheet" href="{BASE}{CSS}">
 {ANALYTICS}
 </head>
 <body>
