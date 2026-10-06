@@ -503,6 +503,7 @@ def plan(code):
       <h2 class="h3 import-h">{t["plan_import_h2"]}</h2>
       <p class="hint">{t["plan_import_help"]}</p>
       <pre id="plan-import" class="import"></pre>
+      <p id="plan-import-count" class="count"></p>
       <p id="plan-import-warn" class="warn-line"></p>
       <button id="plan-import-copy" class="btn amber" type="button">{t["plan_import_copy"]}</button>
       <details class="fields-details">
@@ -546,6 +547,8 @@ def plan(code):
   <h3>{t["plan_format_worked_h3"]}</h3>
   <p class="quote">{t["plan_format_worked_q"]}</p>
   <p>{t["plan_format_worked_a"]}</p>
+  <pre class="import">{esc(t["plan_format_worked_import"])}</pre>
+  <p>{t["plan_format_worked_b"]}</p>
   <h3 class="note-h">{t["plan_note_h3"]}</h3>
   <p class="note">{t["plan_note_p"]}</p>
 </div></section>
@@ -590,7 +593,7 @@ def llms():
 - Price: free, no subscription, no ads, no account; donations: {PLAIN_DONATE}
 - Watches: round Garmin watches with Connect IQ 5.0+ (Forerunner 165–970, fēnix 7/8/9/E, epix Gen 2/Pro, Enduro 3, MARQ Gen 2, Venu 2/3/4, vívoactive 5/6)
 - Schedules: up to 5, each a chain of steps by distance (km) or time (min) with repeats; per step a name, grams of carbs and a caffeine mark
-- Settings format (Garmin Connect, per schedule: Import, Name, Unit, Step 1–12): one step field = `[Nx] size [text] [carbsg] [caf]` or `@position [text] [carbsg] [caf]`, e.g. `3x5 Gel 25g caf`, `@21 Gel 25g`; grams always with `g`; unused fields `-`; or the whole schedule in Import as `name;km|min;step;step;…`; full reference and plan builder: {BASE}plan/#format
+- Settings format (Garmin Connect, per schedule: Import, Name, Unit, Step 1–12): one step field = `[Nx] size [text] [carbsg] [caf]` or `@position [text] [carbsg] [caf]`, e.g. `3x5 Gel 25g caf`, `@21 Gel 25g`; grams always with `g`; unused fields `-`; or the whole schedule in Import as `name;km|min;step;step;…` (one item per line, each ending in `;`, as the plan builder writes it; max 256 characters); full reference in plain text: {BASE}llms-full.txt; plan builder: {BASE}plan/
 - Alert: vibration, tone and full screen, 60 s / 150 m before the planned moment by default; afterwards the field keeps showing the last moment ("Gel · now", then "Gel · km 20")
 - Converting an existing plan (Maurten planner, coach, book): paste it into an AI assistant with the prompt on {BASE}plan/#ai; the builder can load the resulting import text to check the moments
 - Data: planned carbs, carbs per hour, fuel and caffeine moments saved in the activity (Garmin Connect charts)
@@ -657,6 +660,12 @@ def format_section():
 ### {t["plan_format_worked_h3"]}
 {t["plan_format_worked_q"]}
 {strip(t["plan_format_worked_a"])}
+
+```
+{t["plan_format_worked_import"]}
+```
+
+{strip(t["plan_format_worked_b"])}
 """
 
 

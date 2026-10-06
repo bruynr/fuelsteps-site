@@ -139,6 +139,9 @@ body.dragging, body.dragging * { user-select: none; -webkit-user-select: none; c
 .fields code.dash { color: #999; }
 .import-h { margin-top: 28px; }
 .import { font-family: ui-monospace, Consolas, "Cascadia Mono", monospace; font-size: 15px; line-height: 1.5; background: #fff; border: 1px solid #e7e1d3; border-radius: 10px; padding: 10px 12px; margin: 0 0 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.count { font-size: 14px; color: var(--muted); text-align: right; margin: -4px 0 8px; font-variant-numeric: tabular-nums; }
+.count.warn { color: var(--amber-dark); font-weight: 600; }
+.count.bad { color: #a04000; font-weight: 700; }
 .warn-line { color: var(--amber-dark); font-size: 15px; margin: 0 0 8px; }
 .warn-line:empty { display: none; }
 .fields .val { flex: 1; font-weight: 600; }
