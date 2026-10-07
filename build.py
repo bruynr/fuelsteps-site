@@ -13,9 +13,7 @@ BASE = "https://fuelsteps.com/"
 DONATE_PAYPAL = "https://paypal.me/rdbruijn"
 DONATE_BUNQ = "https://bunq.me/fuelsteps"  # card, iDEAL | Wero, Bancontact
 PLAIN_DONATE = f"{DONATE_PAYPAL} · {DONATE_BUNQ}"  # for plain-text output (JSON-LD, llms.txt)
-# Connect IQ Store: off = grey "soon" buttons; set True once Garmin approved the app (the store page 404s before that)
-STORE_LIVE = False
-STORE_ID = "ef36e68c-361f-4554-b7f5-e1f14946fbf2"
+STORE_ID = "ef36e68c-361f-4554-b7f5-e1f14946fbf2"  # Connect IQ Store app
 ORDER = ["en", "nl", "de", "fr", "es", "it"]
 ROOT = Path(__file__).parent
 
@@ -194,10 +192,14 @@ def store(code):
     return f"https://apps.garmin.com/{T[code]['locale'].replace('_', '-')}/apps/{STORE_ID}"
 
 
-# "[Install FuelSteps]" in install step 1: a store link once live, plain text before that
+# Umami counts store clicks per language through the data-umami-event attribute
+def store_track(code):
+    return f'data-umami-event="store_click" data-umami-event-lang="{code}"'
+
+
+# "[Install FuelSteps]" in install step 1 links to the store
 def store_step(s, code):
-    url = store(code)
-    return re.sub(r"\[(.+?)\]", lambda m: f'<a href="{url}" data-umami-event="store_click" data-umami-event-lang="{code}">{m.group(1)}</a>' if STORE_LIVE else m.group(1), s)
+    return re.sub(r"\[(.+?)\]", lambda m: f'<a href="{store(code)}" {store_track(code)}>{m.group(1)}</a>', s)
 
 
 
@@ -221,19 +223,9 @@ def page(code):
         "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
         "image": BASE + WEB + "icon-512.png",
         "screenshot": [BASE + "img/fr970-run.png", BASE + "img/fr970-alert.png", BASE + "img/fenix847mm-before.png"],
+        "downloadUrl": store(code),
     }
-    if STORE_LIVE:
-        app["downloadUrl"] = store(code)
-    # Umami counts store clicks per language through the data-umami-event attribute
-    track = f'data-umami-event="store_click" data-umami-event-lang="{code}"'
-    nav_store = (f'<a class="btn dark" href="{store(code)}" {track}>{t["nav_store"]}</a>' if STORE_LIVE
-                 else f'<span class="btn soon">{t["nav_soon"]}</span>')
-    menu_store = f'\n  <a href="{store(code)}" {track}>{t["nav_store"]} · Connect IQ Store</a>' if STORE_LIVE else ""
-    gel = f'<a class="btn amber" href="{donate}" data-donate>{t["hero_gel"]}</a>'
-    # live: Garmin's official badge (unaltered, per the Connect IQ brand guidelines) + gel, the plan builder as a text link
-    ctas = (f'<a class="store-badge" href="{store(code)}" {track}><img src="{up}img/connect-iq-badge.svg" alt="{esc(t["hero_store"])}" width="187" height="64"></a>\n      {gel}\n    </div>\n'
-            f'    <p class="plan-link"><a href="plan/">{t["hero_plan_link"]}</a></p>' if STORE_LIVE
-            else f'<a class="btn dark" href="plan/">{t["plan_cta"]}</a>\n      <span class="btn soon">{t["hero_soon"]}</span>\n      {gel}\n    </div>')
+    shop, track = store(code), store_track(code)
     faq = {
         "@context": "https://schema.org", "@type": "FAQPage", "name": f"FuelSteps · {t['faq_kicker']}", "url": url, "inLanguage": code,
         "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": unlinked(a, donate_plain)}} for q, a in t["faq"]],
@@ -287,10 +279,11 @@ def page(code):
   <nav class="langs" aria-label="Language">{langs}</nav>
   <a class="btn ghost" href="plan/">{t["plan_nav"]}</a>
   <a class="btn ghost" href="{donate}" data-donate>{t["nav_donate"]}</a>
-  {nav_store}
+  <a class="btn dark" href="{shop}" {track}>{t["nav_store"]}</a>
   <button class="burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg></button>
 </div>
-<div class="menu" id="menu" hidden>{menu_store}
+<div class="menu" id="menu" hidden>
+  <a href="{shop}" {track}>{t["nav_store"]} · Connect IQ Store</a>
   <a href="plan/">{t["plan_nav"]}</a>
   <a href="{donate}" data-donate>{t["nav_donate"]}</a>
   <nav class="langs-menu" aria-label="Language">{langs}</nav>
@@ -304,7 +297,10 @@ def page(code):
     <h1>{t["hero_h1"]}</h1>
     <p class="lead">{t["hero_lead"]}</p>
     <div class="ctas">
-      {ctas}
+      <a class="store-badge" href="{shop}" {track}><img src="{up}img/connect-iq-badge.svg" alt="{esc(t["hero_store"])}" width="187" height="64"></a>
+      <a class="btn amber" href="{donate}" data-donate>{t["hero_gel"]}</a>
+    </div>
+    <p class="plan-link"><a href="plan/">{t["hero_plan_link"]}</a></p>
   </div>
   {pic(up, "fr970-run", t["alt_hero"], "(max-width: 820px) 90vw, 460px", lazy=False, cls="watch")}
 </div></section>
@@ -616,12 +612,12 @@ def llms():
     t = T["en"]
     faq = "\n".join(f"### {q}\n{unlinked(a, PLAIN_DONATE)}\n" for q, a in t["faq"])
     pages = "\n".join(f"- [{T[c]['language']}]({BASE + path(c)})" for c in ORDER)
-    get = f"\n- Install: Connect IQ Store {store('en')}" if STORE_LIVE else ""
     return f"""# FuelSteps
 
 > {t["desc"]}
 
-- Type: Garmin Connect IQ data field (runs inside the native Run activity){get}
+- Type: Garmin Connect IQ data field (runs inside the native Run activity)
+- Install: Connect IQ Store {store('en')}
 - Price: free, no subscription, no ads, no account; donations: {PLAIN_DONATE}
 - Watches: round Garmin watches with Connect IQ 5.0+ (Forerunner 165–970, fēnix 7/8/9/E, epix Gen 2/Pro, Enduro 3, MARQ Gen 2, Venu 2/3/4, vívoactive 5/6)
 - Schedules: up to 5, each a chain of steps by distance (km) or time (min) with repeats; per step a name, grams of carbs and a caffeine mark
@@ -706,14 +702,13 @@ def llms_full():
     t = T["en"]
     bullets = lambda items: "\n".join(f"- {strip(i)}" for i in items)
     faq = "\n".join(f"### {q}\n{unlinked(a, PLAIN_DONATE)}\n" for q, a in t["faq"])
-    get = f" · Connect IQ Store: {store('en')}" if STORE_LIVE else ""
     return f"""# FuelSteps: {strip(t["hero_h1"])}
 
 > {t["desc"]}
 
 {strip(t["hero_lead"])}
 
-Website: {BASE}{get} · Donations: {PLAIN_DONATE}
+Website: {BASE} · Connect IQ Store: {store('en')} · Donations: {PLAIN_DONATE}
 
 ## {strip(t["sched_h2"])}
 {strip(t["sched_lead"])}
