@@ -1,6 +1,6 @@
 // plan.js — DOM layer of the plan builder. All logic lives in plan-core.js; this file renders state,
 // copies values, keeps the schedule in localStorage and sends Umami events (names only, no schedule contents).
-import { LIMITS, TEMPLATES, validate, fields, moments, fromJSON, newStep, importText, importWarnings, parseImport } from "./plan-core.js";
+import { LIMITS, TEMPLATES, validate, moments, fromJSON, newStep, importText, importWarnings, parseImport } from "./plan-core.js";
 
 const STORAGE = "fuelsteps-plan";
 const S = JSON.parse(document.getElementById("plan-i18n").textContent);
@@ -166,41 +166,9 @@ function renderErrors(v) {
 }
 const reportedErrors = new Set();
 
-// the 10 Garmin Connect fields; name and unit are typed/picked in the app, only the step lines get a copy button
-function fieldRows() {
-  const f = fields(schedule);
-  return [
-    { key: "name", label: S.name, value: f.name, copy: false },
-    { key: "unit", label: S.unit, value: S["unit_" + f.unit], copy: false },
-    ...f.steps.map((v, i) => ({ key: "step" + (i + 1), label: fmt(S.field_step, { n: i + 1 }), value: v, copy: true })),
-  ];
-}
-
-function renderFields() {
-  const ol = $("plan-fields");
-  ol.replaceChildren();
-  for (const r of fieldRows()) {
-    const li = el("li", {}, el("span", { class: "lbl" }, r.label));
-    if (r.copy) {
-      li.append(el("code", { class: r.value === "-" ? "dash" : "" }, r.value),
-        el("button", { class: "copy", type: "button", onclick: (e) => {
-          copyText(r.value, e.currentTarget);
-          track("plan_copy", { field: r.key, unit: schedule.unit, steps: schedule.steps.length });
-        } }, S.copy));
-    } else {
-      li.append(el("span", { class: "val" }, r.value));
-    }
-    ol.append(li);
-  }
-}
-
 function renderImport() {
   const text = importText(schedule);
   $("plan-import").textContent = text;
-  // live length against the Import field limit; line breaks count as one character, like in Garmin Connect
-  const count = $("plan-import-count");
-  count.textContent = `${text.length} / ${LIMITS.importMax}`;
-  count.className = "count" + (text.length > LIMITS.importMax ? " bad" : text.length >= LIMITS.importMax - 26 ? " warn" : "");
   const warn = { semicolon: S.warn_import_semicolon, long: fmt(S.warn_import_long, { max: LIMITS.importMax }) };
   $("plan-import-warn").textContent = importWarnings(schedule).map((w) => warn[w]).join(" ");
 }
@@ -232,7 +200,6 @@ function render(rebuild = false) {
   if (rebuild || !document.activeElement || !$("plan-steps").contains(document.activeElement)) renderSteps(v);
   else $("plan-steps").querySelectorAll("tr").forEach((tr, i) => tr.classList.toggle("bad", v.steps[i] !== null));
   renderErrors(v);
-  renderFields();
   renderImport();
   renderMoments();
   save();
@@ -251,11 +218,6 @@ $("plan-template").addEventListener("change", (e) => {
   render();
 });
 $("plan-add").addEventListener("click", () => { schedule.steps.push(newStep()); render(); });
-$("plan-copy-all").addEventListener("click", (e) => {
-  copyText(fieldRows().map((r) => `${r.label}: ${r.value}`).join("\n"), e.currentTarget);
-  const m = moments(schedule);
-  track("plan_copy_all", { unit: schedule.unit, steps: schedule.steps.length, moments: m.count, caf: m.cafCount, total_g: m.totalCarbs });
-});
 $("plan-import-copy").addEventListener("click", (e) => {
   const text = importText(schedule);
   copyText(text, e.currentTarget);
