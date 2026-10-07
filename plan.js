@@ -1,6 +1,6 @@
 // plan.js — DOM layer of the plan builder. All logic lives in plan-core.js; this file renders state,
 // copies values, keeps the schedule in localStorage and sends Umami events (names only, no schedule contents).
-import { LIMITS, TEMPLATES, validate, moments, fromJSON, newStep, importText, importWarnings, parseImport } from "./plan-core.js";
+import { LIMITS, TEMPLATES, DEFAULT_TEXT, validate, moments, fromJSON, newStep, importText, importWarnings, parseImport } from "./plan-core.js";
 
 const STORAGE = "fuelsteps-plan";
 const S = JSON.parse(document.getElementById("plan-i18n").textContent);
@@ -143,7 +143,7 @@ function renderSteps(v) {
       handleCell,
       el("td", { class: "rep", "data-label": S.col_repeat }, repeatSelect(s)),
       el("td", { class: "size", "data-label": unit }, modeSelect(s), stepInput("number", s.size, { min: 0, max: lim.max, step: lim.step, "aria-label": S.col_mode + " (" + unit + ")" }, (t) => { s.size = t.valueAsNumber; })),
-      el("td", { class: "text", "data-label": S.col_text }, stepInput("text", s.text, { maxlength: LIMITS.fieldMax, "aria-label": S.col_text }, (t) => { s.text = t.value; })),
+      el("td", { class: "text", "data-label": S.col_text }, stepInput("text", s.text, { maxlength: LIMITS.fieldMax, placeholder: DEFAULT_TEXT, "aria-label": S.col_text }, (t) => { s.text = t.value; })),
       el("td", { class: "carbs", "data-label": S.col_carbs }, stepInput("number", s.carbs || "", { min: 0, max: LIMITS.carbsMax, step: 1, placeholder: "0", "aria-label": S.col_carbs }, (t) => { s.carbs = Number.isNaN(t.valueAsNumber) ? 0 : t.valueAsNumber; })),
       el("td", { class: "caf", "data-label": S.col_caf }, el("input", { type: "checkbox", checked: s.caf, "aria-label": S.col_caf, onchange: (e) => { s.caf = e.target.checked; render(); } })),
       el("td", { class: "del" }, el("button", { class: "icon-btn", type: "button", title: S.delete, "aria-label": S.delete, onclick: () => { schedule.steps.splice(i, 1); render(true); } }, "✕")));

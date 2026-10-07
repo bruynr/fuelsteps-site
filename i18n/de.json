@@ -87,6 +87,7 @@
   "plan_template_pick": "Wählen…",
   "plan_template_confirm": "Die aktuellen Schritte durch diese Vorlage ersetzen?",
   "plan_steps_h2": "Schritte",
+  "plan_steps_lead": "Pro Schritt: wie oft, nach wie vielen km oder Minuten (oder an einer Position ab Start), was du nimmst, wie viel Gramm und ob Koffein drin ist. Name leer = Gel.",
   "plan_col_repeat": "Wiederholen",
   "plan_col_mode": "Position",
   "plan_opt_after": "nach",

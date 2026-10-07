@@ -87,6 +87,7 @@
   "plan_template_pick": "Scegli…",
   "plan_template_confirm": "Sostituire i passi attuali con questo modello?",
   "plan_steps_h2": "Passi",
+  "plan_steps_lead": "Per passo: quante volte, dopo quanti km o minuti (o a una posizione dalla partenza), cosa prendi, quanti grammi e se contiene caffeina. Nome vuoto = Gel.",
   "plan_col_repeat": "Ripeti",
   "plan_col_mode": "Posizione",
   "plan_opt_after": "dopo",

@@ -87,6 +87,7 @@
   "plan_template_pick": "Kies…",
   "plan_template_confirm": "De huidige stappen vervangen door dit sjabloon?",
   "plan_steps_h2": "Stappen",
+  "plan_steps_lead": "Per stap: hoe vaak, na hoeveel km of minuten (of op een positie vanaf de start), wat je neemt, hoeveel gram en of er cafeïne in zit. Naam leeg = Gel.",
   "plan_col_repeat": "Herhaal",
   "plan_col_mode": "Positie",
   "plan_opt_after": "na",
