@@ -20,7 +20,7 @@ T = {code: json.loads((ROOT / "i18n" / f"{code}.json").read_text(encoding="utf-8
 
 WEB = "img/web/"            # generated from img/ by images()
 WIDTHS = [320, 480, 960]    # responsive WebP widths
-SHOTS = {"fr970-run": (612, 822), "fr970-alert": (612, 822), "fr970-half": (612, 822), "fr970-quarter": (612, 822),
+SHOTS = {"fr970-run": (612, 822), "fr970-alert": (612, 822), "fr970-half": (612, 822), "fr970-quarter-almost": (612, 822),
          "fenix847mm-run": (684, 897), "fenix847mm-almost": (684, 897), "fenix847mm-before": (684, 897)}
 LANG_KEY = "fuelsteps-lang"  # localStorage: language picked in the switcher
 
@@ -333,7 +333,7 @@ def page(code):
   <div class="faces">
     <div class="face"><div>{pic(up, "fr970-run", "", "270px")}</div>{t["full"]}</div>
     <div class="face"><div>{pic(up, "fr970-half", "", "270px")}</div>{t["half"]}</div>
-    <div class="face"><div>{pic(up, "fr970-quarter", "", "270px")}</div>{t["quarter"]}</div>
+    <div class="face"><div>{pic(up, "fr970-quarter-almost", "", "270px")}</div>{t["quarter"]}</div>
   </div>
 </div></section>
 
