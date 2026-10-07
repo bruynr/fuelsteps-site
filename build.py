@@ -570,12 +570,28 @@ def plan(code):
 """
 
 
+# last commit date (YYYY-MM-DD) of the given source files; today when git or the history is unavailable
+# (a shallow checkout gives nothing, so the deploy workflow checks out with fetch-depth: 0)
+def lastmod(*files):
+    import subprocess
+    try:
+        out = subprocess.run(["git", "log", "-1", "--format=%cs", "--", *files], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    except OSError:
+        out = ""
+    return out or date.today().isoformat()
+
+
+# sources per page: the texts and the template; the plan page also changes with its script
+def page_lastmod(code, sub):
+    files = [f"i18n/{code}.json", "build.py"] + (["plan.js", "plan-core.js"] if sub else [])
+    return lastmod(*files)
+
+
 def sitemap():
-    today = date.today().isoformat()
     def entry(sub):
         alt = "".join(f'\n    <xhtml:link rel="alternate" hreflang="{c}" href="{BASE}{path(c)}{sub}"/>' for c in ORDER)
         alt += f'\n    <xhtml:link rel="alternate" hreflang="x-default" href="{BASE}{sub}"/>'
-        return "".join(f"\n  <url>\n    <loc>{BASE}{path(c)}{sub}</loc>\n    <lastmod>{today}</lastmod>{alt}\n  </url>" for c in ORDER)
+        return "".join(f"\n  <url>\n    <loc>{BASE}{path(c)}{sub}</loc>\n    <lastmod>{page_lastmod(c, sub)}</lastmod>{alt}\n  </url>" for c in ORDER)
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'
             f"{entry('')}{entry('plan/')}\n</urlset>\n")
