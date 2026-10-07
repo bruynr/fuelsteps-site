@@ -5,7 +5,7 @@ export const LIMITS = {
   km: { min: 0.5, max: 100, step: 0.5 },
   min: { min: 5, max: 600, step: 5 },
   repeatMax: 30, nameMax: 16, fieldMax: 40, maxSteps: 12, carbsMax: 9999,
-  importMax: 256, // practical Garmin Connect paste limit for one text field
+  importMax: 1000, // maxLength of a schedule field in Garmin Connect (settings.xml); the total store is ~8 KB
   textAdvice: 16, // longer labels are cut off on the watch (alert and field draw the label in one line)
 };
 export const DEFAULT_TEXT = "Gel";
@@ -125,13 +125,6 @@ export function validate(schedule) {
   });
   const ok = !nameErr && schedule.steps.length > 0 && steps.every(e => e === null);
   return { ok, name: nameErr, steps, warnings };
-}
-
-// the 14 Garmin Connect fields: name, unit, step 1-12 ("-" when unused)
-export function fields(schedule) {
-  const steps = schedule.steps.slice(0, LIMITS.maxSteps).map(formatStep);
-  while (steps.length < LIMITS.maxSteps) steps.push("-");
-  return { name: String(schedule.name ?? "").trim(), unit: schedule.unit, steps };
 }
 
 // a step the watch could run at all: whole repeat within the limit and a number as size (keeps the preview bounded while typing)
