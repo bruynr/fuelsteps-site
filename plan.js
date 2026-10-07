@@ -239,3 +239,4 @@ $("plan-ai-load").addEventListener("click", () => {
 });
 
 render();
+track("plan_view", {}); // one event for every language version, so a single Umami goal or funnel step covers /plan/ and /<lang>/plan/
