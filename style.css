@@ -131,22 +131,11 @@ body.dragging, body.dragging * { user-select: none; -webkit-user-select: none; c
 .errors { list-style: none; padding: 0; margin: 14px 0 0; color: #a04000; font-size: 16px; }
 .errors li.warn { color: #6b6558; }
 .hint { color: var(--muted); font-size: 16px; margin-bottom: 14px; }
-.fields { list-style: none; padding: 0; margin: 0 0 16px; }
-.fields li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid #eee; }
-.fields .lbl { width: 72px; color: #666; font-weight: 600; font-size: 15px; flex: none; }
-.fields code, .examples code, .format-list code, .format p code { font-family: ui-monospace, Consolas, "Cascadia Mono", monospace; font-size: 16px; background: #fff; border: 1px solid #e7e1d3; border-radius: 6px; padding: 2px 8px; }
-.fields code { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.fields code.dash { color: #999; }
+.examples code, .format-list code, .format p code { font-family: ui-monospace, Consolas, "Cascadia Mono", monospace; font-size: 16px; background: #fff; border: 1px solid #e7e1d3; border-radius: 6px; padding: 2px 8px; }
 .import-h { margin-top: 28px; }
 .import { font-family: ui-monospace, Consolas, "Cascadia Mono", monospace; font-size: 15px; line-height: 1.5; background: #fff; border: 1px solid #e7e1d3; border-radius: 10px; padding: 10px 12px; margin: 0 0 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
-.count { font-size: 14px; color: var(--muted); text-align: right; margin: -4px 0 8px; font-variant-numeric: tabular-nums; }
-.count.warn { color: var(--amber-dark); font-weight: 600; }
-.count.bad { color: #a04000; font-weight: 700; }
 .warn-line { color: var(--amber-dark); font-size: 15px; margin: 0 0 8px; }
 .warn-line:empty { display: none; }
-.fields .val { flex: 1; font-weight: 600; }
-.copy { border: 2px solid var(--ink); background: #fff; color: var(--ink); border-radius: 20px; padding: 5px 12px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
-.copy.done { background: var(--ink); color: #fff; }
 .moments-table .tag { margin-left: 4px; }
 .totals { margin-top: 14px; font-weight: 700; color: var(--muted); }
 .format { max-width: 860px; }
@@ -158,9 +147,6 @@ body.dragging, body.dragging * { user-select: none; -webkit-user-select: none; c
 .format .note { font-size: 16px; }
 .examples td:first-child { white-space: nowrap; width: 230px; }
 .lead-link { margin-top: 14px; font-size: 18px; } .lead-link a { font-weight: 700; }
-.fields-details { margin-top: 28px; border-top: 1px solid #e7e1d3; padding-top: 14px; }
-.fields-details summary { font-weight: 700; cursor: pointer; color: var(--muted); font-size: 16px; }
-.fields-details .hint { margin-top: 12px; }
 /* "already have a plan": prompt for an AI assistant, plan → import-text examples, and a paste box to check the answer */
 .ai .lead { max-width: 640px; }
 .ai-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: start; margin-top: 30px; }

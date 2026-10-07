@@ -1,10 +1,9 @@
 // plan-core.test.js
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseStepText, formatStep, LIMITS, TEMPLATES, validate, fields, moments, fromJSON, newStep, importSegments, importText, importWarnings, parseImport } from "./plan-core.js";
+import { parseStepText, formatStep, LIMITS, TEMPLATES, validate, moments, fromJSON, newStep, importSegments, importText, importWarnings, parseImport } from "./plan-core.js";
 
 const step = (size, repeat, text, carbs, caf, abs = false) => ({ size, repeat, text, carbs, caf, abs });
-const dashes = (n) => Array(n).fill("-");
 
 test("parse plain", () => {
   assert.deepEqual(parseStepText("30 Gel 25g"), step(30, 1, "Gel", 25, false));
@@ -86,7 +85,7 @@ test("limits", () => {
   assert.equal(LIMITS.repeatMax, 30);
   assert.equal(LIMITS.fieldMax, 40);
   assert.equal(LIMITS.maxSteps, 12);
-  assert.equal(LIMITS.importMax, 256);
+  assert.equal(LIMITS.importMax, 1000);
 });
 
 const sched = (unit, steps, name = "Test") => ({ name, unit, steps });
@@ -94,9 +93,9 @@ const sched = (unit, steps, name = "Test") => ({ name, unit, steps });
 test("templates are valid and have the agreed content", () => {
   assert.deepEqual(TEMPLATES.map(t => t.id), ["gel5", "marathon7", "time30"]);
   for (const t of TEMPLATES) assert.equal(validate(t.schedule).ok, true, t.id);
-  assert.deepEqual(fields(TEMPLATES[0].schedule), { name: "Gel 5 km", unit: "km", steps: ["3x5 Gel 25g caf", ...dashes(11)] });
-  assert.deepEqual(fields(TEMPLATES[1].schedule).steps.slice(0, 5), ["0 Gel 25g", "7 Gel 25g", "7 Dextro 15g", "7 Gel CAF 25g caf", "2x7 Gel 25g"]);
-  assert.deepEqual(fields(TEMPLATES[2].schedule), { name: "Every 30 min", unit: "min", steps: ["6x30 Gel 25g", ...dashes(11)] });
+  assert.equal(importText(TEMPLATES[0].schedule), "Gel 5 km;\nkm;\n3x5 Gel 25g caf");
+  assert.equal(importText(TEMPLATES[2].schedule), "Every 30 min;\nmin;\n6x30 Gel 25g");
+  assert.deepEqual(importSegments(TEMPLATES[1].schedule).slice(2, 7), ["0 Gel 25g", "7 Gel 25g", "7 Dextro 15g", "7 Gel CAF 25g caf", "2x7 Gel 25g"]);
 });
 
 test("validate: ok schedule", () => {
@@ -146,13 +145,6 @@ test("validate: roundtrip warning when the text would be read differently", () =
   const v = validate(sched("km", [step(5, 1, "Bar 25g", 0, false), step(5, 1, "Gel caf", 0, false), step(5, 1, "Gel", 25, false), step(5, 1, "Maurten 100", 0, false)]));
   assert.deepEqual(v.warnings, ["roundtrip", "roundtrip", null, "bare_number"]); // a bare number with 0 g is a hint, not a roundtrip problem
   assert.equal(v.ok, true); // warnings do not block
-});
-
-test("fields: 14 values, dash for unused, trimmed name", () => {
-  const f = fields(sched("min", [step(30, 1, "Gel", 25, false)], "  Long run "));
-  assert.equal(f.name, "Long run");
-  assert.equal(f.unit, "min");
-  assert.deepEqual(f.steps, ["30 Gel 25g", ...dashes(11)]);
 });
 
 test("importSegments carries the whole schedule", () => {
@@ -207,7 +199,7 @@ test("newStep", () => {
   assert.deepEqual(newStep(), { size: 5, repeat: 1, text: "Gel", carbs: 25, caf: false, abs: false });
 });
 
-test("moments and fields ignore steps the watch would reject (unbounded repeat, empty size)", () => {
+test("moments ignore steps the watch would reject (unbounded repeat, empty size)", () => {
   const huge = moments(sched("km", [step(5, 3000000, "Gel", 25, false), step(5, 1, "Gel", 25, false)]));
   assert.deepEqual(huge.rows.map(r => r.at), [5]); // the invalid step adds no rows, the valid one still counts from 0
   const empty = moments(sched("km", [step(NaN, 1, "Gel", 25, false), step(5, 2, "Gel", 25, false)]));
@@ -229,8 +221,18 @@ test("import text: one segment per line, warnings for ; and length", () => {
   // a ; inside the name or a step text would split the import on the watch
   assert.deepEqual(importWarnings(sched("km", [step(5, 1, "Gel", 25, false)], "Run; A")), ["semicolon"]);
   assert.deepEqual(importWarnings(sched("km", [step(5, 1, "Gel;Iso", 25, false)])), ["semicolon"]);
-  const long = sched("km", Array(12).fill(step(5, 1, "Maurten Gel 100 CAF", 25, true)), "Long name here");
-  assert.deepEqual(importWarnings(long), ["long"]);
+  // Garmin Connect refuses more than 1000 characters (maxLength of the schedule field)
+  assert.equal(LIMITS.importMax, 1000);
+  const twelveLong = sched("km", Array(12).fill(step(5, 1, "x".repeat(34), 25, true)), "Long name here"); // 12 × 46 + 19 = 571
+  assert.deepEqual(importWarnings(twelveLong), []);
+  const over = sched("km", Array(12).fill(step(5, 1, "y".repeat(78), 25, true)), "Long name here"); // 12 × 90 + 19 > 1000
+  assert.deepEqual(importWarnings(over), ["long"]);
+  // exactly at the limit: no warning (fill the name so the text is 1000 characters long)
+  const base = sched("km", Array(12).fill(step(5, 1, "z".repeat(70), 25, true)), "");
+  const pad = LIMITS.importMax - importText(base).length;
+  const exact = { ...base, name: "n".repeat(pad) };
+  assert.equal(importText(exact).length, LIMITS.importMax);
+  assert.deepEqual(importWarnings(exact), []);
 });
 
 test("parseImport: name;unit;steps, ; or newline separated, spaces trimmed", () => {
