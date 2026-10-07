@@ -87,6 +87,7 @@
   "plan_template_pick": "Choose…",
   "plan_template_confirm": "Replace the current steps with this template?",
   "plan_steps_h2": "Steps",
+  "plan_steps_lead": "Per step: how often, after how many km or minutes (or at a position from the start), what you take, how many grams and whether it has caffeine. Name empty = Gel.",
   "plan_col_repeat": "Repeat",
   "plan_col_mode": "Position",
   "plan_opt_after": "after",

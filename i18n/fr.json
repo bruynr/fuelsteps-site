@@ -87,6 +87,7 @@
   "plan_template_pick": "Choisir…",
   "plan_template_confirm": "Remplacer les étapes actuelles par ce modèle ?",
   "plan_steps_h2": "Étapes",
+  "plan_steps_lead": "Par étape : combien de fois, après combien de km ou de minutes (ou à une position depuis le départ), ce que tu prends, combien de grammes et s'il y a de la caféine. Nom vide = Gel.",
   "plan_col_repeat": "Répéter",
   "plan_col_mode": "Position",
   "plan_opt_after": "après",
