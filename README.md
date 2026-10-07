@@ -11,4 +11,4 @@ Landing page for [FuelSteps](https://fuelsteps.com/), a free Garmin Connect IQ d
 - Language: the home page sends first-time visitors to their browser language (nl, de, fr, es, it); a choice in the switcher is remembered (localStorage `fuelsteps-lang`) and always wins
 - Moving to another domain: change `BASE` in `build.py` and rebuild
 
-If you like FuelSteps: [donate via bunq (iDEAL/WERO)](https://bunq.me/fuelsteps) or [PayPal](https://paypal.me/rdbruijn)
+If you like FuelSteps: [donate via bunq (card, iDEAL | Wero, Bancontact)](https://bunq.me/fuelsteps) or [PayPal](https://paypal.me/rdbruijn)

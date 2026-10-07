@@ -11,7 +11,7 @@ from pathlib import Path
 
 BASE = "https://fuelsteps.com/"
 DONATE_PAYPAL = "https://paypal.me/rdbruijn"
-DONATE_BUNQ = "https://bunq.me/fuelsteps"  # iDEAL/WERO
+DONATE_BUNQ = "https://bunq.me/fuelsteps"  # card, iDEAL | Wero, Bancontact
 PLAIN_DONATE = f"{DONATE_PAYPAL} · {DONATE_BUNQ}"  # for plain-text output (JSON-LD, llms.txt)
 ORDER = ["en", "nl", "de", "fr", "es", "it"]
 ROOT = Path(__file__).parent
@@ -58,7 +58,7 @@ document.querySelectorAll("a[hreflang]").forEach(function (a) {{
 }});
 </script>"""
 
-# donation links open the overlay with both options; without JS the href (bunq on NL, PayPal elsewhere) still works
+# donation links open the overlay with both options; without JS the href (bunq) still works
 DONATE_JS = """<script>
 (function () {
   var o = document.getElementById("donate-overlay");
@@ -191,9 +191,7 @@ def page(code):
     t = T[code]
     up = "" if code == "en" else "../"
     url = BASE + path(code)
-    donates = [(DONATE_BUNQ, t["donate_bunq"]), (DONATE_PAYPAL, t["donate_paypal"])]
-    if code != "nl":
-        donates.reverse()  # bunq (iDEAL/WERO) on top only for Dutch visitors
+    donates = [(DONATE_BUNQ, t["donate_bunq"]), (DONATE_PAYPAL, t["donate_paypal"])]  # bunq on top: card works everywhere
     donate = donates[0][0]  # no-JS fallback for the trigger links
     donate_plain = " · ".join(u for u, _ in donates)
     donate_btns = "".join(f'\n    <a class="btn {cls}" href="{u}" data-provider="{"bunq" if u == DONATE_BUNQ else "paypal"}">{esc(label)}</a>' for (u, label), cls in zip(donates, ("amber", "dark")))
