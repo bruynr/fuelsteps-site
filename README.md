@@ -10,5 +10,6 @@ Landing page for [FuelSteps](https://fuelsteps.com/), a free Garmin Connect IQ d
 - SEO: canonical + hreflang per page, Open Graph, `SoftwareApplication`, `FAQPage`, `WebSite` and `WebPage` JSON-LD, sitemap with language alternates, responsive WebP; IndexNow ping (Bing, Yandex, …) after every deploy (`python build.py indexnow`, key file at the root)
 - Language: the home page sends first-time visitors to their browser language (nl, de, fr, es, it); a choice in the switcher is remembered (localStorage `fuelsteps-lang`) and always wins
 - Moving to another domain: change `BASE` in `build.py` and rebuild
+- Store launch: once Garmin approved the app, set `STORE_LIVE = True` in `build.py` and push. The grey "soon" buttons become the official Connect IQ badge (`img/connect-iq-badge.svg`, unaltered per Garmin's brand guidelines), a Download button, a link in install step 1 and `downloadUrl` in the JSON-LD, each to the store page in the page language (`apps.garmin.com/<locale>/apps/<id>`); Umami event `store_click` (lang)
 
 If you like FuelSteps: [donate via bunq (card, iDEAL | Wero, Bancontact)](https://bunq.me/fuelsteps) or [PayPal](https://paypal.me/rdbruijn)
