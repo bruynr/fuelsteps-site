@@ -195,7 +195,12 @@ function renderFields() {
 }
 
 function renderImport() {
-  $("plan-import").textContent = importText(schedule);
+  const text = importText(schedule);
+  $("plan-import").textContent = text;
+  // live length against the Import field limit; line breaks count as one character, like in Garmin Connect
+  const count = $("plan-import-count");
+  count.textContent = `${text.length} / ${LIMITS.importMax}`;
+  count.className = "count" + (text.length > LIMITS.importMax ? " bad" : text.length >= LIMITS.importMax - 26 ? " warn" : "");
   const warn = { semicolon: S.warn_import_semicolon, long: fmt(S.warn_import_long, { max: LIMITS.importMax }) };
   $("plan-import-warn").textContent = importWarnings(schedule).map((w) => warn[w]).join(" ");
 }

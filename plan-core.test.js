@@ -144,7 +144,7 @@ test("validate: absolute steps", () => {
 
 test("validate: roundtrip warning when the text would be read differently", () => {
   const v = validate(sched("km", [step(5, 1, "Bar 25g", 0, false), step(5, 1, "Gel caf", 0, false), step(5, 1, "Gel", 25, false), step(5, 1, "Maurten 100", 0, false)]));
-  assert.deepEqual(v.warnings, ["roundtrip", "roundtrip", null, null]); // a bare number in the name is fine now
+  assert.deepEqual(v.warnings, ["roundtrip", "roundtrip", null, "bare_number"]); // a bare number with 0 g is a hint, not a roundtrip problem
   assert.equal(v.ok, true); // warnings do not block
 });
 
@@ -249,4 +249,20 @@ test("parseImport: null when it isn't an import text", () => {
   assert.equal(parseImport("Run;miles;5 Gel"), null);
   assert.equal(parseImport("Run;km;kapot"), null);
   assert.equal(parseImport("Run;km"), null);
+});
+
+test("parseImport reads the builder's own list format, also with Windows line endings", () => {
+  const s = sched("km", [step(4, 1, "Banaan", 25, false, true), step(8, 1, "Dextro", 10, false, true)], "Long run");
+  const list = importText(s);
+  assert.equal(list, "Long run;\nkm;\n@4 Banaan 25g;\n@8 Dextro 10g");
+  assert.deepEqual(parseImport(list), s);
+  assert.deepEqual(parseImport(list.replace(/\n/g, "\r\n")), s);
+  assert.deepEqual(parseImport(list + ";\n"), s); // every line ending in ;
+  assert.deepEqual(parseImport("Long run;;km;\n\n@4 Banaan 25g"), sched("km", [step(4, 1, "Banaan", 25, false, true)], "Long run")); // blank segments skipped, like the watch
+});
+
+test("validate: bare_number warning when the last word is a number without g", () => {
+  const v = validate(sched("km", [step(5, 1, "Gel 25", 0, false), step(5, 1, "Gel 25", 25, false), step(5, 1, "Gel 100", 25, false), step(5, 1, "Gel 100", 0, true), step(5, 1, "Gel", 0, false)]));
+  assert.deepEqual(v.warnings, ["bare_number", null, null, "bare_number", null]); // with grams filled in, the number is clearly part of the name
+  assert.equal(v.ok, true);
 });
