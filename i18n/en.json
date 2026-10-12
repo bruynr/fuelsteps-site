@@ -139,7 +139,7 @@
     "<code>carbs</code>: optional, whole grams, always with a <code>g</code>: <code>25g</code>, default 0.",
     "<code>caf</code>: optional, any case, marks caffeine (shown on the alert, counted in the activity).",
     "<code>0</code> as size is only allowed as the first step without repeat: the gel you take before the start, counted in the totals, no alert.",
-    "<b>The import text</b>: <code>name;km|min;step;step;…</code>, separated by <code>;</code>, on one line or one item per line as on this page, e.g. <code>Long run;km;0 Gel 25g;10 Gel 25g;3x5 Gel 25g</code>. An error on the watch names the step's position in the text.",
+    "<b>The import text</b>: <code>name;km|min;step;step;…</code>, separated by <code>;</code>, also when each item is on its own line (as on this page): Garmin Connect has a single text field that may drop line breaks, e.g. <code>Long run;km;0 Gel 25g;10 Gel 25g;3x5 Gel 25g</code>. An error on the watch names the step's position in the text.",
     "One invalid step makes the whole schedule invalid; the menu on the watch names the step."
   ],
   "plan_format_examples_h3": "Examples",

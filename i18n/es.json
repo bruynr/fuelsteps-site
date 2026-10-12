@@ -139,7 +139,7 @@
     "<code>carbohidratos</code>: opcional, gramos enteros, siempre con <code>g</code>: <code>25g</code>, por defecto 0.",
     "<code>caf</code>: opcional, con o sin mayúsculas, marca la cafeína (se muestra en la alerta, se cuenta en la actividad).",
     "<code>0</code> como tamaño solo se permite como primer paso sin repetición: el gel que tomas antes de salir, cuenta en los totales, sin alerta.",
-    "<b>El texto de importación</b>: <code>nombre;km|min;paso;paso;…</code>, separados por <code>;</code>, en una línea o un elemento por línea como en esta página, por ejemplo <code>Tirada larga;km;0 Gel 25g;10 Gel 25g;3x5 Gel 25g</code>. Un error en el reloj indica la posición del paso en el texto.",
+    "<b>El texto de importación</b>: <code>nombre;km|min;paso;paso;…</code>, separados por <code>;</code>, también si cada elemento va en su propia línea (como en esta página): Garmin Connect tiene un solo campo de texto que puede quitar los saltos de línea, por ejemplo <code>Tirada larga;km;0 Gel 25g;10 Gel 25g;3x5 Gel 25g</code>. Un error en el reloj indica la posición del paso en el texto.",
     "Un solo paso no válido invalida todo el plan; el menú del reloj indica el paso."
   ],
   "plan_format_examples_h3": "Ejemplos",

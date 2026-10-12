@@ -139,7 +139,7 @@
     "<code>Gramm</code>: optional, ganze Gramm, immer mit <code>g</code>: <code>25g</code>, Standard 0.",
     "<code>caf</code>: optional, Groß- oder Kleinschreibung egal, markiert Koffein (im Alarm sichtbar, in der Aktivität gezählt).",
     "<code>0</code> als Größe ist nur als erster Schritt ohne Wiederholung erlaubt: das Gel vor dem Start, zählt in den Summen, kein Alarm.",
-    "<b>Der Importtext</b>: <code>Name;km|min;Schritt;Schritt;…</code>, getrennt durch <code>;</code>, in einer Zeile oder ein Eintrag pro Zeile wie auf dieser Seite, z. B. <code>Langer Lauf;km;0 Gel 25g;10 Gel 25g;3x5 Gel 25g</code>. Ein Fehler auf der Uhr nennt die Position des Schritts im Text.",
+    "<b>Der Importtext</b>: <code>Name;km|min;Schritt;Schritt;…</code>, getrennt durch <code>;</code>, auch wenn jeder Eintrag in einer eigenen Zeile steht (wie auf dieser Seite): Garmin Connect hat ein einziges Textfeld, das Zeilenumbrüche entfernen kann, z. B. <code>Langer Lauf;km;0 Gel 25g;10 Gel 25g;3x5 Gel 25g</code>. Ein Fehler auf der Uhr nennt die Position des Schritts im Text.",
     "Ein ungültiger Schritt macht den ganzen Plan ungültig; das Menü auf der Uhr nennt den Schritt."
   ],
   "plan_format_examples_h3": "Beispiele",

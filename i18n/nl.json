@@ -139,7 +139,7 @@
     "<code>gram</code>: optioneel, hele grammen, altijd met een <code>g</code>: <code>25g</code>, standaard 0.",
     "<code>caf</code>: optioneel, hoofdletters of niet, markeert cafeïne (op de melding, geteld in de activiteit).",
     "<code>0</code> als maat mag alleen als eerste stap zonder herhaling: de gel die je voor de start neemt, telt mee in de totalen, geen melding.",
-    "<b>De importtekst</b>: <code>naam;km|min;stap;stap;…</code>, gescheiden door <code>;</code>, op één regel of één onderdeel per regel zoals op deze pagina, bijvoorbeeld <code>Lange duurloop;km;0 Gel 25g;10 Gel 25g;3x5 Gel 25g</code>. Een fout op het horloge noemt de positie van de stap in de tekst.",
+    "<b>De importtekst</b>: <code>naam;km|min;stap;stap;…</code>, gescheiden door <code>;</code>, ook als elk onderdeel op een eigen regel staat (zoals op deze pagina): Garmin Connect heeft één tekstveld dat regeleinden kan weghalen, bijvoorbeeld <code>Lange duurloop;km;0 Gel 25g;10 Gel 25g;3x5 Gel 25g</code>. Een fout op het horloge noemt de positie van de stap in de tekst.",
     "Eén ongeldige stap maakt het hele schema ongeldig; het menu op het horloge noemt de stap."
   ],
   "plan_format_examples_h3": "Voorbeelden",

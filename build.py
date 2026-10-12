@@ -601,7 +601,7 @@ def llms():
 - Price: free, no subscription, no ads, no account; donations: {PLAIN_DONATE}
 - Watches: round Garmin watches with Connect IQ 5.0+ (Forerunner 165–970, fēnix 7/8/9/E, epix Gen 2/Pro, Enduro 3, MARQ Gen 2, Venu 2/3/4, vívoactive 5/6)
 - Schedules: up to 5, each a chain of steps by distance (km) or time (min) with repeats; per step a name, grams of carbs and a caffeine mark
-- Settings format (Garmin Connect: one text field per schedule, 5 schedules, empty = unused, max 1000 characters): `name;km|min;step;step;…`, one step = `[Nx] size [text] [carbsg] [caf]` or `@position [text] [carbsg] [caf]`, e.g. `Long run;km;0 Gel 25g;10 Gel 25g;3x5 Gel 25g caf`; grams always with `g`; full reference in plain text: {BASE}llms-full.txt; plan builder: {BASE}plan/
+- Settings format (Garmin Connect: one text field per schedule, 5 schedules, empty = unused, max 1000 characters): `name;km|min;step;step;…`, one step = `[Nx] size [text] [carbsg] [caf]` or `@position [text] [carbsg] [caf]`, e.g. `Long run;km;0 Gel 25g;10 Gel 25g;3x5 Gel 25g caf`; a `;` after every item, also with one item per line (Garmin Connect may drop line breaks); grams always with `g`; full reference in plain text: {BASE}llms-full.txt; plan builder: {BASE}plan/
 - Alert: vibration, tone and full screen, 60 s / 150 m before the planned moment by default; afterwards the field keeps showing the last moment ("Gel · now", then "Gel · km 20")
 - Converting an existing plan (Maurten planner, coach, book): paste it into an AI assistant with the prompt on {BASE}plan/#ai; the builder can load the resulting import text to check the moments
 - Data: planned carbs, carbs per hour, fuel and caffeine moments saved in the activity (Garmin Connect charts)

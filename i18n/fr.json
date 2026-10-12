@@ -139,7 +139,7 @@
     "<code>glucides</code> : optionnel, grammes entiers, toujours avec un <code>g</code> : <code>25g</code>, par défaut 0.",
     "<code>caf</code> : optionnel, majuscules ou non, marque la caféine (affichée sur l'alerte, comptée dans l'activité).",
     "<code>0</code> comme taille n'est permis qu'en première étape sans répétition : le gel pris avant le départ, compté dans les totaux, sans alerte.",
-    "<b>Le texte d'import</b> : <code>nom;km|min;étape;étape;…</code>, séparés par <code>;</code>, sur une ligne ou un élément par ligne comme sur cette page, par exemple <code>Sortie longue;km;0 Gel 25g;10 Gel 25g;3x5 Gel 25g</code>. Une erreur sur la montre indique la position de l'étape dans le texte.",
+    "<b>Le texte d'import</b> : <code>nom;km|min;étape;étape;…</code>, séparés par <code>;</code>, aussi quand chaque élément est sur sa propre ligne (comme sur cette page) : Garmin Connect n'a qu'un champ de texte, qui peut supprimer les retours à la ligne, par exemple <code>Sortie longue;km;0 Gel 25g;10 Gel 25g;3x5 Gel 25g</code>. Une erreur sur la montre indique la position de l'étape dans le texte.",
     "Une seule étape invalide rend tout le plan invalide ; le menu de la montre indique l'étape."
   ],
   "plan_format_examples_h3": "Exemples",
