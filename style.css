@@ -88,6 +88,13 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
 .faq details { background: #fff; border-radius: 16px; padding: 18px 22px; margin-bottom: 12px; box-shadow: 0 6px 20px rgba(40, 30, 0, .06); }
 .faq summary { font-size: 20px; font-weight: 700; cursor: pointer; }
 .faq details p { font-size: 18px; color: var(--muted); margin-top: 10px; }
+.releases article { background: #fff; border-radius: 16px; padding: 18px 22px; margin-bottom: 12px; max-width: 760px; box-shadow: 0 6px 20px rgba(40, 30, 0, .06); }
+.releases .meta { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.releases time { font-size: 14px; font-weight: 700; color: #6b6558; }
+.releases p, .releases li { font-size: 17px; color: var(--muted); }
+.releases p + ul, .releases ul + p { margin-top: 8px; }
+.releases ul { padding-left: 20px; }
+.releases li + li { margin-top: 4px; }
 .overlay { position: fixed; inset: 0; z-index: 20; background: rgba(21, 23, 26, .6); display: flex; align-items: center; justify-content: center; padding: 28px; }
 .overlay[hidden] { display: none; }
 .overlay-box { position: relative; background: #fff; border-radius: 24px; padding: 38px 34px 34px; max-width: 430px; width: 100%; text-align: center;
