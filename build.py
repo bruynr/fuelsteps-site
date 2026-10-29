@@ -42,12 +42,12 @@ REDIRECT = f"""<script>
 (function () {{
   try {{
     var langs = {json.dumps(ORDER[1:])}, saved = localStorage.getItem("{LANG_KEY}");
-    if (saved) {{ if (langs.indexOf(saved) >= 0) location.replace(saved + "/" + location.hash); return; }}
+    if (saved) {{ if (langs.indexOf(saved) >= 0) location.replace(saved + "/" + location.search + location.hash); return; }}
     var prefs = navigator.languages || [navigator.language || ""];
     for (var i = 0; i < prefs.length; i++) {{
       var l = String(prefs[i]).slice(0, 2).toLowerCase();
       if (l === "en") return;
-      if (langs.indexOf(l) >= 0) {{ location.replace(l + "/" + location.hash); return; }}
+      if (langs.indexOf(l) >= 0) {{ location.replace(l + "/" + location.search + location.hash); return; }}
     }}
   }} catch (e) {{}}
 }})();
