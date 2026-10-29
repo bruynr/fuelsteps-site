@@ -159,12 +159,17 @@ function renderErrors(v) {
   if (schedule.steps.length === 0) ul.append(el("li", {}, S.err_no_steps));
   v.steps.forEach((e, i) => { if (e) ul.append(el("li", {}, fmt(S.field_step, { n: i + 1 }) + ": " + S["err_" + e])); });
   v.warnings.forEach((w, i) => { if (w) ul.append(el("li", { class: "warn" }, fmt(S.field_step, { n: i + 1 }) + ": " + S["warn_" + w])); });
-  // which validation problems people run into, once per code per visit (no field contents)
-  for (const code of new Set([v.name, ...v.steps, ...v.warnings].filter(Boolean))) {
-    if (!reportedErrors.has(code)) { reportedErrors.add(code); track("plan_error", { code }); }
+}
+
+// which validation problems people run into, once per code per visit (no field contents); reported when a field is left
+// (change event), not while typing: "0,5" passes through "0" and an emptied field is briefly below the minimum
+const reportedErrors = new Set();
+let lastValidation = null;
+function reportErrors(...codes) {
+  for (const code of codes) {
+    if (code && !reportedErrors.has(code)) { reportedErrors.add(code); track("plan_error", { code }); }
   }
 }
-const reportedErrors = new Set();
 
 function renderImport() {
   const text = importText(schedule);
@@ -194,6 +199,7 @@ function renderMoments() {
 // rebuild = true after a structural change (move, delete): the row buttons hold focus, but the table must follow the schedule
 function render(rebuild = false) {
   const v = validate(schedule);
+  lastValidation = v;
   if (document.activeElement !== $("plan-name")) $("plan-name").value = schedule.name;
   document.querySelectorAll('#plan-unit input[name="unit"]').forEach((r) => { r.checked = r.value === schedule.unit; });
   // while typing in a step input the table is not rebuilt, so the input keeps focus and its half-typed value; the row state is refreshed in place
@@ -206,6 +212,12 @@ function render(rebuild = false) {
 }
 
 $("plan-name").addEventListener("input", (e) => { schedule.name = e.target.value; render(); });
+$("plan-name").addEventListener("change", () => reportErrors(lastValidation.name));
+// row index before the row's own change handler runs (a mode change rebuilds the table, which detaches the row);
+// reported after it, when the stored validation matches the committed value
+let changedRow = -1;
+$("plan-steps").addEventListener("change", (e) => { changedRow = [...$("plan-steps").children].indexOf(e.target.closest("tr")); }, true);
+$("plan-steps").addEventListener("change", () => { if (changedRow >= 0) reportErrors(lastValidation.steps[changedRow], lastValidation.warnings[changedRow]); });
 document.querySelectorAll('#plan-unit input[name="unit"]').forEach((r) => r.addEventListener("change", (e) => { schedule.unit = e.target.value; render(); }));
 $("plan-template").addEventListener("change", (e) => {
   const choice = e.target.value; // "" = the placeholder, "empty" = start blank, otherwise a template id

@@ -179,5 +179,6 @@
   "plan_ai_load_bad": "Esto no es un texto de importación válido. Pide al asistente solo el texto de importación.",
   "plan_json_ld_name": "Creador de planes FuelSteps",
   "footer_watches": "Forerunner, fēnix, epix, Enduro, MARQ, Venu y vívoactive con Connect IQ 5.0+",
+  "footer_releases": "Novedades",
   "not_affiliated": "Sin relación con Garmin."
 }

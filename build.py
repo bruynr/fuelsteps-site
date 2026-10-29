@@ -42,12 +42,12 @@ REDIRECT = f"""<script>
 (function () {{
   try {{
     var langs = {json.dumps(ORDER[1:])}, saved = localStorage.getItem("{LANG_KEY}");
-    if (saved) {{ if (langs.indexOf(saved) >= 0) location.replace(saved + "/" + location.hash); return; }}
+    if (saved) {{ if (langs.indexOf(saved) >= 0) location.replace(saved + "/" + location.search + location.hash); return; }}
     var prefs = navigator.languages || [navigator.language || ""];
     for (var i = 0; i < prefs.length; i++) {{
       var l = String(prefs[i]).slice(0, 2).toLowerCase();
       if (l === "en") return;
-      if (langs.indexOf(l) >= 0) {{ location.replace(l + "/" + location.hash); return; }}
+      if (langs.indexOf(l) >= 0) {{ location.replace(l + "/" + location.search + location.hash); return; }}
     }}
   }} catch (e) {{}}
 }})();
@@ -403,7 +403,7 @@ def page(code):
 <footer><div class="wrap">
   <span>FuelSteps · {t["footer_watches"]}</span>
   <nav class="langs-foot" aria-label="Language">{langs}</nav>
-  <span>{t["not_affiliated"]}</span>
+  <span><a href="{up}releases/">{t["footer_releases"]}</a> · {t["not_affiliated"]}</span>
 </div></footer>
 
 <div class="overlay" id="donate-overlay" hidden>
@@ -569,13 +569,115 @@ def plan(code):
 <footer><div class="wrap">
   <span>FuelSteps · {t["footer_watches"]}</span>
   <nav class="langs-foot" aria-label="Language">{langs}</nav>
-  <span>{t["not_affiliated"]}</span>
+  <span><a href="{up}releases/">{t["footer_releases"]}</a> · {t["not_affiliated"]}</span>
 </div></footer>
 
 <script type="application/json" id="plan-i18n">{json.dumps(ui, ensure_ascii=False)}</script>
 <script type="module" src="{up}{PLAN_JS}"></script>
 {MENU_JS}
 {REMEMBER}
+</body>
+</html>
+"""
+
+
+# releases.md → [(date, label, [("p", text) | ("ul", [items])])], newest first as written; `code` becomes <code>
+def read_releases():
+    def inline(s):
+        return re.sub(r"`(.+?)`", r"<code>\1</code>", esc(s))
+    entries = []
+    for block in re.split(r"^## ", (ROOT / "releases.md").read_text(encoding="utf-8"), flags=re.M)[1:]:
+        head, _, body = block.partition("\n")
+        when, _, label = head.partition(" · ")
+        parts, items = [], []
+        for line in body.splitlines():
+            if line.startswith("- "):
+                items.append(inline(line[2:]))
+            else:
+                if items:
+                    parts.append(("ul", items)); items = []
+                if line.strip():
+                    parts.append(("p", inline(line.strip())))
+        if items:
+            parts.append(("ul", items))
+        entries.append((when.strip(), label.strip(), parts))
+    return entries
+
+
+# /releases/: one English page with the app versions (store "What's new") and the website changes
+def releases():
+    t = T["en"]
+    up = "../"
+    url = f"{BASE}releases/"
+    title = "What's new · FuelSteps"
+    desc = "Updates to the FuelSteps data field for Garmin watches and to fuelsteps.com, newest first."
+    langs = " ".join(f'<a href="{up}{path(c)}" hreflang="{c}" lang="{c}">{T[c]["label"]}</a>' for c in ORDER)
+    webpage = {"@context": "https://schema.org", "@type": "WebPage", "name": "FuelSteps: what's new", "description": desc,
+               "url": url, "inLanguage": "en", "isPartOf": {"@type": "WebSite", "name": "FuelSteps", "url": BASE}}
+    def entry(when, label, parts):
+        tag = f'<span class="tag{"" if label.startswith("App") else " b"}">{esc(label)}</span>'
+        body = "".join(f"<p>{text}</p>" if kind == "p" else "<ul>" + "".join(f"<li>{i}</li>" for i in text) + "</ul>" for kind, text in parts)
+        return f'<article><div class="meta"><time datetime="{when}">{when}</time>{tag}</div>{body}</article>'
+    articles = "\n".join(entry(*e) for e in read_releases())
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content="{desc}">
+<link rel="canonical" href="{url}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="FuelSteps">
+<meta property="og:title" content="{title}">
+<meta property="og:description" content="{desc}">
+<meta property="og:url" content="{url}">
+<meta property="og:image" content="{BASE}{WEB}og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="600">
+<meta name="theme-color" content="#15171a">
+<link rel="icon" href="{up}{WEB}icon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="{up}{WEB}icon-180.png">
+<link rel="manifest" href="{up}manifest.webmanifest">
+<link rel="stylesheet" href="{up}{CSS}">
+<script type="application/ld+json">
+{json.dumps(webpage, ensure_ascii=False, indent=1)}
+</script>
+{ANALYTICS}
+</head>
+<body>
+
+<header><div class="wrap">
+  <a class="brand" href="{up}"><img src="{up}{WEB}icon-192.png" alt="" width="38" height="38"><b>Fuel<em>Steps</em></b></a>
+  <nav class="langs" aria-label="Language">{langs}</nav>
+  <a class="btn ghost" href="{up}#donate">{t["nav_donate"]}</a>
+  <button class="burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg></button>
+</div>
+<div class="menu" id="menu" hidden>
+  <a href="{up}#donate">{t["nav_donate"]}</a>
+  <nav class="langs-menu" aria-label="Language">{langs}</nav>
+</div>
+</header>
+
+<main>
+<section class="alt plan-hero"><div class="wrap">
+  <div class="kicker">Releases</div>
+  <h1>What's <em>new</em></h1>
+  <p class="lead">{desc} The app updates through the <a href="{store('en')}" {store_track('en')}>Connect IQ Store</a>; the <a href="{up}plan/">plan builder</a> is always current.</p>
+</div></section>
+
+<section class="releases"><div class="wrap">
+{articles}
+</div></section>
+</main>
+
+<div class="stripe"></div>
+<footer><div class="wrap">
+  <span>FuelSteps · {t["footer_watches"]}</span>
+  <span>{t["not_affiliated"]}</span>
+</div></footer>
+
+{MENU_JS}
 </body>
 </html>
 """
@@ -603,9 +705,10 @@ def sitemap():
         alt = "".join(f'\n    <xhtml:link rel="alternate" hreflang="{c}" href="{BASE}{path(c)}{sub}"/>' for c in ORDER)
         alt += f'\n    <xhtml:link rel="alternate" hreflang="x-default" href="{BASE}{sub}"/>'
         return "".join(f"\n  <url>\n    <loc>{BASE}{path(c)}{sub}</loc>\n    <lastmod>{page_lastmod(c, sub)}</lastmod>{alt}\n  </url>" for c in ORDER)
+    single = f"\n  <url>\n    <loc>{BASE}releases/</loc>\n    <lastmod>{lastmod('releases.md', 'build.py')}</lastmod>\n  </url>"
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'
-            f"{entry('')}{entry('plan/')}\n</urlset>\n")
+            f"{entry('')}{entry('plan/')}{single}\n</urlset>\n")
 
 
 def llms():
@@ -630,6 +733,7 @@ def llms():
 ## Pages
 {pages}
 - [Plan builder and settings format]({BASE}plan/)
+- [What's new (app versions and website changes)]({BASE}releases/)
 - [Full text (English)]({BASE}llms-full.txt)
 
 ## FAQ
@@ -761,6 +865,8 @@ def main():
         out = ROOT / path(code) / "plan" / "index.html"
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(plan(code), encoding="utf-8", newline="\n")
+    (ROOT / "releases").mkdir(exist_ok=True)
+    (ROOT / "releases" / "index.html").write_text(releases(), encoding="utf-8", newline="\n")
     (ROOT / "sitemap.xml").write_text(sitemap(), encoding="utf-8", newline="\n")
     (ROOT / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\nSitemap: {BASE}sitemap.xml\n", encoding="utf-8", newline="\n")
     (ROOT / "llms.txt").write_text(llms(), encoding="utf-8", newline="\n")
