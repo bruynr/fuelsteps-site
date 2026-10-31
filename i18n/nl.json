@@ -15,7 +15,7 @@
   "sched_kicker": "Je schema",
   "sched_h2": "Bouw het als<br>een <em>training.</em>",
   "sched_lead": "Een reeks stappen op afstand of tijd, met herhalingen. Elke stap heeft een eigen naam, grammen en cafeïne. Tot 5 schema's, te kiezen op het horloge.",
-  "sched_li": ["Per schema alles op afstand (km) of alles op tijd (min)", "Herhalingen krijgen automatisch een nummer: Gel #1, #2, #3", "Een gel vóór de start telt mee, zonder melding", "Niet alleen gels: elke stap heeft een eigen tekst, zoals Water, Zout of Reep (0 g mag)"],
+  "sched_li": ["Per schema alles op afstand (km) of alles op tijd (min)", "Herhalingen krijgen automatisch een nummer: Gel #1, #2, #3", "Een gel vóór de start telt mee, zonder melding", "Niet alleen gels: elke stap heeft een eigen tekst, zoals Water, Zout of Reep (0 g mag)", "Een race? Stem je gels af op de drankposten, dan neem je ze met water: <a href=\"plan/#ai\">tip in de planbouwer</a>"],
   "card_title": "Marathon · afstand",
   "tag_before": "voor de start",
   "tag_caf": "cafeïne",
@@ -167,6 +167,9 @@
   "plan_ai_lead": "Een schema van Maurten, je coach of een boek? Maak een screenshot of kopieer de tekst, plak het in Claude, ChatGPT of Copilot en stel deze vraag. Je krijgt een importtekst terug.",
   "plan_ai_prompt": "Zet dit voedingsplan om naar een FuelSteps-schema voor mijn Garmin. Antwoord alleen met de importtekst: één onderdeel per regel, elke regel eindigt op ;\n\nnaam;\nkm of min;\nstap;\nstap;\n…\n\nEen stap is \"[Nx] maat [tekst] [gramg] [caf]\" (maat = km of minuten na het vorige moment, Nx = N keer herhalen) of \"@positie [tekst] [gramg] [caf]\" (positie vanaf de start, geen herhaling). Gram altijd met g (25g); een getal zonder g hoort bij de naam (Gel 100). caf markeert cafeïne. Een eerste stap 0 = vóór de start. Max 12 stappen, naam max 16 tekens.\n\nVoorbeeld:\nLange duurloop;\nkm;\n0 Gel 25g;\n10 Gel 25g;\n3x5 Gel 25g caf;\n\nVolledige uitleg: https://fuelsteps.com/llms-full.txt. Vraag door als iets onduidelijk is.",
   "plan_ai_copy": "Kopieer de vraag",
+  "plan_ai_tip": "Tip: stem je schema af op de drankposten, dan neem je elke gel met water. Plak de link naar de officiële drankpostenpagina van je race samen met de vraag hieronder in je AI-assistent.",
+  "plan_ai_race_h3": "Voor een race",
+  "plan_ai_race_prompt": "Maak een FuelSteps-raceschema voor mijn Garmin. Gebruik het formaat op https://fuelsteps.com/plan/#format. Vraag me om welke race het gaat, mijn verwachte eindtijd en de officiële lijst met drankposten of een link ernaar, als ik die nog niet heb gegeven. Antwoord alleen met de importtekst.",
   "plan_ai_examples_h3": "Van plan naar schema",
   "plan_ai_examples": [
     ["Maurten-planner: Gel 100 na 30, 60 en 90 min, Gel 100 CAF na 120 min", "Maurten 2u;min;3x30 Gel 100 25g;30 Gel 100 CAF 25g caf"],

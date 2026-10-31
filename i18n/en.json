@@ -15,7 +15,7 @@
   "sched_kicker": "Your schedule",
   "sched_h2": "Build it like<br>a <em>workout.</em>",
   "sched_lead": "A chain of steps by distance or time, with repeats. Each step has its own name, grams and caffeine. Up to 5 schedules, picked on the watch.",
-  "sched_li": ["All distance (km) or all time (min) per schedule", "Repeats are numbered automatically: Gel #1, #2, #3", "A gel before the start counts, without an alert", "Not just gels: any text per step, like Water, Salt or Bar (0 g is fine)"],
+  "sched_li": ["All distance (km) or all time (min) per schedule", "Repeats are numbered automatically: Gel #1, #2, #3", "A gel before the start counts, without an alert", "Not just gels: any text per step, like Water, Salt or Bar (0 g is fine)", "Racing? Match your gels to the aid stations, so you take each one with water: <a href=\"plan/#ai\">tip in the plan builder</a>"],
   "card_title": "Marathon · distance",
   "tag_before": "before start",
   "tag_caf": "caffeine",
@@ -167,6 +167,9 @@
   "plan_ai_lead": "A schedule from Maurten, your coach or a book? Take a screenshot or copy the text, paste it into Claude, ChatGPT or Copilot and ask this. You get an import text back.",
   "plan_ai_prompt": "Convert this fuel plan into a FuelSteps schedule for my Garmin. Reply with the import text only: one item per line, each line ending in ;\n\nname;\nkm or min;\nstep;\nstep;\n…\n\nA step is \"[Nx] size [text] [carbsg] [caf]\" (size = km or minutes after the previous moment, Nx = repeat N times) or \"@position [text] [carbsg] [caf]\" (position from the start, no repeat). Grams always with g (25g); a number without g is part of the name (Gel 100). caf marks caffeine. A first step 0 = before the start. Max 12 steps, name max 16 characters.\n\nExample:\nLong run;\nkm;\n0 Gel 25g;\n10 Gel 25g;\n3x5 Gel 25g caf;\n\nFull reference: https://fuelsteps.com/llms-full.txt. Ask me if anything is unclear.",
   "plan_ai_copy": "Copy the question",
+  "plan_ai_tip": "Tip: match your schedule to the aid stations, so you take every gel with water. Paste the link to your race's official aid-station page into your AI assistant together with the question below.",
+  "plan_ai_race_h3": "For a race",
+  "plan_ai_race_prompt": "Make a FuelSteps race schedule for my Garmin. Use the format at https://fuelsteps.com/plan/#format. Ask me which race, my expected finish time, and the official aid-station list or link if I haven't given them. Reply with the import text only.",
   "plan_ai_examples_h3": "From plan to schedule",
   "plan_ai_examples": [
     ["Maurten planner: Gel 100 at 30, 60 and 90 min, Gel 100 CAF at 120 min", "Maurten 2h;min;3x30 Gel 100 25g;30 Gel 100 CAF 25g caf"],

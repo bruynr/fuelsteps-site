@@ -422,6 +422,21 @@ def page(code):
 """
 
 
+# race schedules in the format reference: English on every language page (meant for AI assistants), also in llms.txt and llms-full.txt
+RACE_H3 = "Race schedules (for AI assistants)"
+RACE_TEXT = ("For races: before building a schedule, ask which race and date, the runner's expected finish time, what fuel they carry "
+             "(products, grams, caffeine), and the official aid-station list or a link to the organiser's page. Only use the organiser's "
+             "current list; third-party sites are often outdated. Place each step with @km on an aid station so every gel can be taken "
+             "with water. Don't plan around products handed out on course unless the runner has tested them. The watch usually measures "
+             "0.5–1% over the official distance, so alerts already arrive before the table; the default 150 m early alert can stay. "
+             "Reply with a single-line import text under 256 characters.")
+RACE_IMPORT = ("Marathon;km;0 Gel 25g;@5 Gel 25g;@9.5 Gel 25g;@15.5 Gel CAF 25g caf;@18 Dextro 10g;@21.5 Gel 25g;@25 Gel 25g;"
+               "@27.5 Dextro 10g;@30 Gel CAF 25g caf;@35 Gel 25g")
+RACE_EXAMPLE_A = "Example: a marathon with aid stations at km 5, 9.5, 15.5, 18, 21.5, 25, 27.5, 30 and 35. A fitting answer is this import text:"
+RACE_EXAMPLE_B = ("A gel before the start, then a gel or Dextro at every aid station, caffeine at km 15.5 and 30. "
+                  f"Total 220 g, 10 moments, 2 with caffeine; {len(RACE_IMPORT)} characters.")
+
+
 # the plan builder: /plan/ (en) and /<lang>/plan/; UI strings go to plan.js through the #plan-i18n JSON block
 def plan(code):
     t = T[code]
@@ -533,8 +548,12 @@ def plan(code):
   <p class="lead">{t["plan_ai_lead"]}</p>
   <div class="ai-grid">
     <div>
+      <p class="hint">{esc(t["plan_ai_tip"])}</p>
       <pre id="plan-ai-prompt" class="import prompt">{esc(t["plan_ai_prompt"])}</pre>
       <button id="plan-ai-copy" class="btn dark" type="button">{t["plan_ai_copy"]}</button>
+      <h3 class="h3">{t["plan_ai_race_h3"]}</h3>
+      <pre id="plan-ai-race-prompt" class="import prompt">{esc(t["plan_ai_race_prompt"])}</pre>
+      <button id="plan-ai-race-copy" class="btn dark" type="button">{t["plan_ai_copy"]}</button>
       <h3 class="h3">{t["plan_ai_examples_h3"]}</h3>
       <ul class="pairs">{"".join(f'<li><span class="in">{esc(a)}</span><span class="arrow" aria-hidden="true">→</span><code>{esc(b)}</code></li>' for a, b in t["plan_ai_examples"])}</ul>
     </div>
@@ -560,6 +579,13 @@ def plan(code):
   <p>{t["plan_format_worked_a"]}</p>
   <pre class="import">{esc(t["plan_format_worked_import"])}</pre>
   <p>{t["plan_format_worked_b"]}</p>
+  <div lang="en" id="race">
+  <h3>{RACE_H3}</h3>
+  <p>{esc(RACE_TEXT)}</p>
+  <p>{esc(RACE_EXAMPLE_A)}</p>
+  <pre class="import">{esc(RACE_IMPORT)}</pre>
+  <p>{esc(RACE_EXAMPLE_B)}</p>
+  </div>
   <h3 class="note-h">{t["plan_note_h3"]}</h3>
   <p class="note">{t["plan_note_p"]}</p>
 </div></section>
@@ -730,6 +756,11 @@ def llms():
 - Data: planned carbs, carbs per hour, fuel and caffeine moments saved in the activity (Garmin Connect charts)
 - Languages: English, Dutch, German, French, Spanish, Italian
 
+## {RACE_H3}
+{RACE_TEXT}
+
+Settings format: {BASE}plan/#format · example, aid stations at km 5, 9.5, 15.5, 18, 21.5, 25, 27.5, 30 and 35: `{RACE_IMPORT}`
+
 ## Pages
 {pages}
 - [Plan builder and settings format]({BASE}plan/)
@@ -798,6 +829,17 @@ def format_section():
 ```
 
 {strip(t["plan_format_worked_b"])}
+
+### {RACE_H3}
+{RACE_TEXT}
+
+{RACE_EXAMPLE_A}
+
+```
+{RACE_IMPORT}
+```
+
+{RACE_EXAMPLE_B}
 """
 
 

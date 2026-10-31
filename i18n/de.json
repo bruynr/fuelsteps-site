@@ -15,7 +15,7 @@
   "sched_kicker": "Dein Plan",
   "sched_h2": "Aufgebaut wie<br>ein <em>Training.</em>",
   "sched_lead": "Eine Folge von Schritten nach Distanz oder Zeit, mit Wiederholungen. Jeder Schritt hat eigenen Namen, Gramm und Koffein. Bis zu 5 Pläne, direkt auf der Uhr wählbar.",
-  "sched_li": ["Pro Plan alles nach Distanz (km) oder alles nach Zeit (min)", "Wiederholungen werden automatisch nummeriert: Gel #1, #2, #3", "Ein Gel vor dem Start zählt mit, ohne Alarm", "Nicht nur Gels: jeder Schritt hat einen eigenen Text, z. B. Wasser, Salz oder Riegel (0 g geht)"],
+  "sched_li": ["Pro Plan alles nach Distanz (km) oder alles nach Zeit (min)", "Wiederholungen werden automatisch nummeriert: Gel #1, #2, #3", "Ein Gel vor dem Start zählt mit, ohne Alarm", "Nicht nur Gels: jeder Schritt hat einen eigenen Text, z. B. Wasser, Salz oder Riegel (0 g geht)", "Im Wettkampf? Stimm deine Gels auf die Verpflegungsstellen ab, dann nimmst du sie mit Wasser: <a href=\"plan/#ai\">Tipp im Plan-Builder</a>"],
   "card_title": "Marathon · Distanz",
   "tag_before": "vor dem Start",
   "tag_caf": "Koffein",
@@ -167,6 +167,9 @@
   "plan_ai_lead": "Ein Plan von Maurten, deinem Coach oder aus einem Buch? Mach einen Screenshot oder kopiere den Text, füge ihn in Claude, ChatGPT oder Copilot ein und stelle diese Frage. Du bekommst einen Importtext zurück.",
   "plan_ai_prompt": "Wandle diesen Ernährungsplan in einen FuelSteps-Plan für meine Garmin um. Antworte nur mit dem Importtext: ein Eintrag pro Zeile, jede Zeile endet mit ;\n\nName;\nkm oder min;\nSchritt;\nSchritt;\n…\n\nEin Schritt ist \"[Nx] Größe [Text] [Grammg] [caf]\" (Größe = km oder Minuten nach dem vorigen Moment, Nx = N-mal wiederholen) oder \"@Position [Text] [Grammg] [caf]\" (Position ab Start, keine Wiederholung). Gramm immer mit g (25g); eine Zahl ohne g gehört zum Namen (Gel 100). caf markiert Koffein. Ein erster Schritt 0 = vor dem Start. Max. 12 Schritte, Name max. 16 Zeichen.\n\nBeispiel:\nLanger Lauf;\nkm;\n0 Gel 25g;\n10 Gel 25g;\n3x5 Gel 25g caf;\n\nVollständige Referenz: https://fuelsteps.com/llms-full.txt. Frag nach, wenn etwas unklar ist.",
   "plan_ai_copy": "Frage kopieren",
+  "plan_ai_tip": "Tipp: Stimm deinen Plan auf die Verpflegungsstellen ab, dann nimmst du jedes Gel mit Wasser. Füge den Link zur offiziellen Verpflegungsseite deines Wettkampfs zusammen mit der Frage unten in deinen KI-Assistenten ein.",
+  "plan_ai_race_h3": "Für einen Wettkampf",
+  "plan_ai_race_prompt": "Erstelle einen FuelSteps-Wettkampfplan für meine Garmin. Verwende das Format auf https://fuelsteps.com/plan/#format. Frag mich nach dem Wettkampf, meiner erwarteten Zielzeit und der offiziellen Liste der Verpflegungsstellen oder einem Link dazu, falls ich sie noch nicht genannt habe. Antworte nur mit dem Importtext.",
   "plan_ai_examples_h3": "Vom Plan zum FuelSteps-Plan",
   "plan_ai_examples": [
     ["Maurten-Planer: Gel 100 nach 30, 60 und 90 min, Gel 100 CAF nach 120 min", "Maurten 2h;min;3x30 Gel 100 25g;30 Gel 100 CAF 25g caf"],
