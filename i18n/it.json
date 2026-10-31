@@ -15,7 +15,7 @@
   "sched_kicker": "Il tuo piano",
   "sched_h2": "Costruito come<br>un <em>allenamento.</em>",
   "sched_lead": "Una sequenza di passi a distanza o a tempo, con ripetizioni. Ogni passo ha il suo nome, i suoi grammi e la sua caffeina. Fino a 5 piani, da scegliere sull'orologio.",
-  "sched_li": ["Per piano, tutto a distanza (km) o tutto a tempo (min)", "Le ripetizioni sono numerate in automatico: Gel #1, #2, #3", "Un gel prima della partenza conta, senza avviso", "Non solo gel: ogni passo ha il suo testo, come Acqua, Sale o Barretta (0 g va bene)"],
+  "sched_li": ["Per piano, tutto a distanza (km) o tutto a tempo (min)", "Le ripetizioni sono numerate in automatico: Gel #1, #2, #3", "Un gel prima della partenza conta, senza avviso", "Non solo gel: ogni passo ha il suo testo, come Acqua, Sale o Barretta (0 g va bene)", "In gara? Allinea i gel ai ristori, così li prendi con l'acqua: <a href=\"plan/#ai\">consiglio nel creatore di piani</a>"],
   "card_title": "Maratona · distanza",
   "tag_before": "prima del via",
   "tag_caf": "caffeina",
@@ -167,6 +167,9 @@
   "plan_ai_lead": "Un piano di Maurten, del tuo coach o di un libro? Fai uno screenshot o copia il testo, incollalo in Claude, ChatGPT o Copilot e fai questa domanda. Ricevi un testo di importazione.",
   "plan_ai_prompt": "Converti questo piano di alimentazione in un piano FuelSteps per il mio Garmin. Rispondi solo con il testo di importazione: un elemento per riga, ogni riga termina con ;\n\nnome;\nkm o min;\npasso;\npasso;\n…\n\nUn passo è \"[Nx] misura [testo] [carboidratig] [caf]\" (misura = km o minuti dopo il momento precedente, Nx = ripeti N volte) oppure \"@posizione [testo] [carboidratig] [caf]\" (posizione dalla partenza, senza ripetizione). I grammi sempre con g (25g); un numero senza g fa parte del nome (Gel 100). caf indica la caffeina. Un primo passo 0 = prima della partenza. Max 12 passi, nome max 16 caratteri.\n\nEsempio:\nLungo;\nkm;\n0 Gel 25g;\n10 Gel 25g;\n3x5 Gel 25g caf;\n\nRiferimento completo: https://fuelsteps.com/llms-full.txt. Chiedimi se qualcosa non è chiaro.",
   "plan_ai_copy": "Copia la domanda",
+  "plan_ai_tip": "Consiglio: allinea il tuo piano ai ristori, così prendi ogni gel con l'acqua. Incolla nel tuo assistente IA il link alla pagina ufficiale dei ristori della tua gara insieme alla domanda qui sotto.",
+  "plan_ai_race_h3": "Per una gara",
+  "plan_ai_race_prompt": "Crea un piano gara FuelSteps per il mio Garmin. Usa il formato su https://fuelsteps.com/plan/#format. Chiedimi quale gara, il mio tempo finale previsto e l'elenco ufficiale dei ristori o un link, se non te li ho ancora dati. Rispondi solo con il testo di importazione.",
   "plan_ai_examples_h3": "Dal piano al piano FuelSteps",
   "plan_ai_examples": [
     ["Planner Maurten: Gel 100 a 30, 60 e 90 min, Gel 100 CAF a 120 min", "Maurten 2h;min;3x30 Gel 100 25g;30 Gel 100 CAF 25g caf"],

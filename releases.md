@@ -2,6 +2,11 @@
 
 Source of https://fuelsteps.com/releases/ (English only). Newest first; one `## <date> · <label>` section per entry, label `App <version>` (the Connect IQ Store version, text as in the app's CHANGELOG.md and the store's "What's new") or `Website`. Lines starting with `- ` are bullets, other lines are paragraphs; `code` in backticks.
 
+## 2026-10-31 · Website
+
+- Plan builder: tip to match your schedule to the race's aid stations, and a second AI question for race schedules
+- Settings format: race schedules for AI assistants (ask for the official aid-station list, place steps with `@km` on aid stations), with a worked example; also in `llms.txt`
+
 ## 2026-10-29 · App 1.0.1
 
 - Your schedule now works like a workout: after a saved or discarded run, or when you leave the activity before the start, it is off again. Fixes reminders that could fire on your next run.

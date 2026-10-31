@@ -237,7 +237,11 @@ $("plan-import-copy").addEventListener("click", (e) => {
 });
 $("plan-ai-copy").addEventListener("click", (e) => {
   copyText($("plan-ai-prompt").textContent, e.currentTarget);
-  track("plan_copy_prompt", {});
+  track("plan_copy_prompt", { prompt: "convert" });
+});
+$("plan-ai-race-copy").addEventListener("click", (e) => {
+  copyText($("plan-ai-race-prompt").textContent, e.currentTarget);
+  track("plan_copy_prompt", { prompt: "race" });
 });
 // an import text from an AI assistant (or typed) replaces the schedule, so the moments table checks it
 $("plan-ai-load").addEventListener("click", () => {
