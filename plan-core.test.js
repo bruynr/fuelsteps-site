@@ -1,7 +1,7 @@
 // plan-core.test.js
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseStepText, formatStep, LIMITS, TEMPLATES, validate, moments, fromJSON, newStep, importSegments, importText, importWarnings, parseImport } from "./plan-core.js";
+import { parseStepText, formatStep, LIMITS, TEMPLATES, validate, moments, fromJSON, newStep, importSegments, importText, importWarnings, parseImport, readImport } from "./plan-core.js";
 
 const step = (size, repeat, text, carbs, caf, abs = false) => ({ size, repeat, text, carbs, caf, abs });
 
@@ -261,6 +261,28 @@ test("parseImport reads the builder's own list format, also with Windows line en
   assert.deepEqual(parseImport(list.replace(/\n/g, "\r\n")), s);
   assert.deepEqual(parseImport(list + ";\n"), s); // every line ending in ;
   assert.deepEqual(parseImport("Long run;;km;\n\n@4 Banaan 25g"), sched("km", [step(4, 1, "Banaan", 25, false, true)], "Long run")); // blank segments skipped, like the watch
+});
+
+test("parseImport: tolerates what AI assistants wrap around the import text", () => {
+  const s = sched("km", [step(4, 1, "Banaan", 25, false, true), step(8, 1, "Dextro", 10, false, true)], "Long run");
+  assert.deepEqual(parseImport("```\nLong run;\nkm;\n@4 Banaan 25g;\n@8 Dextro 10g\n```"), s); // code fence
+  assert.deepEqual(parseImport("```text\nLong run;km;@4 Banaan 25g;@8 Dextro 10g\n```"), s);
+  assert.deepEqual(parseImport("`Long run;km;@4 Banaan 25g;@8 Dextro 10g`"), s); // inline code
+  assert.deepEqual(parseImport("Here is your import text:\n\nLong run;\nkm;\n@4 Banaan 25g;\n@8 Dextro 10g"), s); // prose before the name
+  assert.deepEqual(parseImport("Long run;\nkm;\n@4 Banaan 25g;\n@8 Dextro 10g\n\nPaste this into Garmin Connect."), s); // prose after the steps
+  assert.deepEqual(parseImport("- Long run\n- km\n- @4 Banaan 25g\n* @8 Dextro 10g"), s); // list bullets
+  assert.deepEqual(parseImport("**Long run**;KM;@4 Banaan 25g;@8 Dextro 10g"), s); // bold name, unit in capitals
+});
+
+test("readImport: says why a text is not an import text", () => {
+  assert.equal(readImport("Long run;km;@4 Banaan 25g").error, null);
+  assert.equal(readImport("").error, "empty");
+  assert.equal(readImport("```\n```").error, "empty");
+  assert.equal(readImport("Run;miles;5 Gel").error, "unit");
+  assert.equal(readImport("3x5 Gel 25g caf").error, "unit");
+  assert.equal(readImport("Run;km").error, "steps");
+  assert.equal(readImport("Run;km;Thanks!").error, "steps"); // only prose after the header
+  assert.equal(readImport("Run;km;5 Gel;5Gel 25g x;10 Gel").error, "step"); // a broken step in the middle is not skipped
 });
 
 test("validate: bare_number warning when the last word is a number without g", () => {

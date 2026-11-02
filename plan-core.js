@@ -171,12 +171,27 @@ export function importText(schedule) {
 // import text (from the builder, an AI assistant or typed) → schedule, or null when it isn't one:
 // "name;km|min;step;step;…", separated by ; and/or line breaks (also ";\n" and "\r\n"); blank segments are skipped, like the watch does
 export function parseImport(text) {
-  if (typeof text !== "string") return null;
-  const segs = text.split(/[;\r\n]/).map((s) => s.trim()).filter(Boolean);
-  if (segs.length < 3 || !(segs[1] in LIMITS)) return null;
-  const steps = segs.slice(2, 2 + LIMITS.maxSteps).map(parseStepText);
-  if (steps.some((s) => s === null)) return null;
-  return { name: segs[0], unit: segs[1], steps };
+  return readImport(text).schedule;
+}
+
+// { schedule, error }: error says why a pasted text is not an import text ("empty", "unit", "steps", "step").
+// AI assistants wrap the text in code fences, bullets, bold or a sentence before and after; that is stripped here,
+// the builder writes clean text back, so the watch never sees it
+export function readImport(text) {
+  const fail = (error) => ({ schedule: null, error });
+  if (typeof text !== "string") return fail("empty");
+  const segs = text.split(/\r?\n/).filter((line) => !/^\s*```/.test(line)).join("\n")
+    .replace(/`|\*\*/g, "")
+    .split(/[;\r\n]/).map((s) => s.trim().replace(/^[-*•]\s+/, "")).filter(Boolean);
+  if (segs.length === 0) return fail("empty");
+  const at = segs.findIndex((s, i) => i > 0 && (s.toLowerCase() === "km" || s.toLowerCase() === "min")) - 1; // the name precedes the unit
+  if (at < 0) return fail("unit");
+  const rest = segs.slice(at + 2);
+  while (rest.length && !/^[@\d]/.test(rest[rest.length - 1])) rest.pop(); // a closing sentence, not a step
+  if (rest.length === 0) return fail("steps");
+  const steps = rest.slice(0, LIMITS.maxSteps).map(parseStepText);
+  if (steps.some((s) => s === null)) return fail("step");
+  return { schedule: { name: segs[at], unit: segs[at + 1].toLowerCase(), steps }, error: null };
 }
 
 // "semicolon": a ; in the name or a step text would split the import on the watch; "long": over the paste limit
