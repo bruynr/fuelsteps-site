@@ -248,7 +248,7 @@ test("parseImport: @ steps keep their absolute position", () => {
 test("parseImport: null when it isn't an import text", () => {
   assert.equal(parseImport(""), null);
   assert.equal(parseImport("3x5 Gel 25g caf"), null); // a single step field, no header
-  assert.equal(parseImport("Run;miles;5 Gel"), null);
+  assert.equal(parseImport("Run;mi;5 Gel"), null); // mi is not the miles token
   assert.equal(parseImport("Run;km;kapot"), null);
   assert.equal(parseImport("Run;km"), null);
 });
@@ -278,11 +278,25 @@ test("readImport: says why a text is not an import text", () => {
   assert.equal(readImport("Long run;km;@4 Banaan 25g").error, null);
   assert.equal(readImport("").error, "empty");
   assert.equal(readImport("```\n```").error, "empty");
-  assert.equal(readImport("Run;miles;5 Gel").error, "unit");
+  assert.equal(readImport("Run;mi;5 Gel").error, "unit");
   assert.equal(readImport("3x5 Gel 25g caf").error, "unit");
   assert.equal(readImport("Run;km").error, "steps");
   assert.equal(readImport("Run;km;Thanks!").error, "steps"); // only prose after the header
   assert.equal(readImport("Run;km;5 Gel;5Gel 25g x;10 Gel").error, "step"); // a broken step in the middle is not skipped
+});
+
+test("miles: a third distance unit with the km rules", () => {
+  assert.deepEqual(LIMITS.miles, LIMITS.km);
+  const s = readImport("Long;MILES;3x5 Gel 25g");
+  assert.equal(s.error, null);
+  assert.equal(s.schedule.unit, "miles");
+  assert.equal(importText(s.schedule), "Long;\nmiles;\n3x5 Gel 25g");
+  assert.equal(fromJSON(JSON.stringify(s.schedule)).unit, "miles"); // localStorage round trip
+  assert.equal(readImport("Long;distance;5 Gel").error, "unit");
+  assert.equal(validate(sched("miles", [step(0.4, 1, "Gel", 25, false)])).steps[0], "size_min");
+  assert.equal(validate(sched("miles", [step(50.5, 2, "Gel", 25, false)])).steps[0], "total_max");
+  assert.equal(validate(sched("miles", [step(10, 1, "Gel", 0, false), step(10.2, 1, "Gel", 0, false, true)])).steps[1], "abs_back");
+  assert.deepEqual(moments(sched("miles", [step(5, 2, "Gel", 25, false)])).rows.map((r) => r.at), [5, 10]);
 });
 
 test("validate: bare_number warning when the last word is a number without g", () => {
