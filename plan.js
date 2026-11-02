@@ -1,6 +1,6 @@
 // plan.js — DOM layer of the plan builder. All logic lives in plan-core.js; this file renders state,
 // copies values, keeps the schedule in localStorage and sends Umami events (names only, no schedule contents).
-import { LIMITS, TEMPLATES, DEFAULT_TEXT, validate, moments, fromJSON, newStep, importText, importWarnings, parseImport } from "./plan-core.js";
+import { LIMITS, TEMPLATES, DEFAULT_TEXT, validate, moments, fromJSON, newStep, importText, importWarnings, readImport } from "./plan-core.js";
 
 const STORAGE = "fuelsteps-plan";
 const S = JSON.parse(document.getElementById("plan-i18n").textContent);
@@ -49,6 +49,7 @@ async function copyText(text, button) {
   button.textContent = ok ? S.copied : S.copy_failed;
   button.classList.toggle("done", ok);
   setTimeout(() => { button.textContent = button.dataset.label; button.classList.remove("done"); }, ok ? 1200 : 2500);
+  return ok;
 }
 
 function stepInput(type, value, attrs, onChange) {
@@ -230,10 +231,11 @@ $("plan-template").addEventListener("change", (e) => {
   render();
 });
 $("plan-add").addEventListener("click", () => { schedule.steps.push(newStep()); render(); });
-$("plan-import-copy").addEventListener("click", (e) => {
+// ok: whether the clipboard accepted it (most visitors copy on a phone)
+$("plan-import-copy").addEventListener("click", async (e) => {
   const text = importText(schedule);
-  copyText(text, e.currentTarget);
-  track("plan_copy_import", { unit: schedule.unit, steps: schedule.steps.length, len: text.length });
+  const ok = await copyText(text, e.currentTarget);
+  track("plan_copy_import", { unit: schedule.unit, steps: schedule.steps.length, len: text.length, ok });
 });
 $("plan-ai-copy").addEventListener("click", (e) => {
   copyText($("plan-ai-prompt").textContent, e.currentTarget);
@@ -245,9 +247,9 @@ $("plan-ai-race-copy").addEventListener("click", (e) => {
 });
 // an import text from an AI assistant (or typed) replaces the schedule, so the moments table checks it
 $("plan-ai-load").addEventListener("click", () => {
-  const parsed = parseImport($("plan-ai-paste").value);
+  const { schedule: parsed, error } = readImport($("plan-ai-paste").value);
   $("plan-ai-msg").textContent = parsed ? "" : S.ai_load_bad;
-  track("plan_load_import", { ok: !!parsed });
+  track("plan_load_import", parsed ? { ok: true } : { ok: false, why: error }); // the reason, never the pasted text
   if (!parsed) return;
   schedule = parsed;
   render(true);
