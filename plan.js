@@ -203,6 +203,7 @@ function render(rebuild = false) {
   lastValidation = v;
   if (document.activeElement !== $("plan-name")) $("plan-name").value = schedule.name;
   document.querySelectorAll('#plan-unit input[name="unit"]').forEach((r) => { r.checked = r.value === schedule.unit; });
+  $("plan-miles-note").hidden = schedule.unit !== "miles"; // a 1.0.x app rejects miles
   // while typing in a step input the table is not rebuilt, so the input keeps focus and its half-typed value; the row state is refreshed in place
   if (rebuild || !document.activeElement || !$("plan-steps").contains(document.activeElement)) renderSteps(v);
   else $("plan-steps").querySelectorAll("tr").forEach((tr, i) => tr.classList.toggle("bad", v.steps[i] !== null));
