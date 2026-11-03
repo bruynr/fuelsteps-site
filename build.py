@@ -35,6 +35,7 @@ def v(name):
 
 CSS = f"style.css?v={v('style.css')}"
 PLAN_JS = f"plan.js?v={v('plan.js')}"
+PLAN_CORE_JS = f"plan-core.js?v={v('plan-core.js')}"  # imported by plan.js; hashed through an import map
 INDEXNOW_KEY = "1d775e9d727f50ad83cd05991cf82236"  # public by design: served as /<key>.txt (Bing, Yandex, …)
 
 # home page only: on the first visit send the visitor to their browser language; a choice in the switcher wins
@@ -426,7 +427,7 @@ def page(code):
 RACE_H3 = "Race schedules (for AI assistants)"
 RACE_TEXT = ("For races: before building a schedule, ask which race and date, the runner's expected finish time, what fuel they carry "
              "(products, grams, caffeine), and the official aid-station list or a link to the organiser's page. Only use the organiser's "
-             "current list; third-party sites are often outdated. Place each step with @km on an aid station so every gel can be taken "
+             "current list; third-party sites are often outdated. Place each step with @km (@mile on a miles schedule) on an aid station so every gel can be taken "
              "with water. Don't plan around products handed out on course unless the runner has tested them. The watch usually measures "
              "0.5–1% over the official distance, so alerts already arrive before the table; the default 150 m early alert can stay. "
              "Reply with a single-line import text under 256 characters.")
@@ -513,7 +514,9 @@ def plan(code):
         <label>{t["plan_name"]}<input id="plan-name" type="text" maxlength="16" autocomplete="off"></label>
         <fieldset id="plan-unit"><legend>{t["plan_unit"]}</legend>
           <label><input type="radio" name="unit" value="km"> {t["plan_unit_km"]} ({t["plan_km"]})</label>
+          <label><input type="radio" name="unit" value="miles"> {t["plan_unit_miles"]} ({t["plan_miles"]})</label>
           <label><input type="radio" name="unit" value="min"> {t["plan_unit_min"]} ({t["plan_min"]})</label>
+          <small id="plan-miles-note" class="hint" hidden>{t["plan_miles_note"]}</small>
         </fieldset>
         <label>{t["plan_template"]}<select id="plan-template"><option value="">{t["plan_template_pick"]}</option><option value="empty">{t["plan_template_blank"]}</option>{tpl_opts}</select></label>
       </div>
@@ -599,6 +602,7 @@ def plan(code):
 </div></footer>
 
 <script type="application/json" id="plan-i18n">{json.dumps(ui, ensure_ascii=False)}</script>
+<script type="importmap">{{"imports": {{"{up}plan-core.js": "{up}{PLAN_CORE_JS}"}}}}</script>
 <script type="module" src="{up}{PLAN_JS}"></script>
 {MENU_JS}
 {REMEMBER}
@@ -749,8 +753,8 @@ def llms():
 - Install: Connect IQ Store {store('en')}
 - Price: free, no subscription, no ads, no account; donations: {PLAIN_DONATE}
 - Watches: round Garmin watches with Connect IQ 5.0+ (Forerunner 165–970, fēnix 7/8/9/E, epix Gen 2/Pro, Enduro 3, MARQ Gen 2, Venu 2/3/4, vívoactive 5/6)
-- Schedules: up to 5, each a chain of steps by distance (km) or time (min) with repeats; per step a name, grams of carbs and a caffeine mark
-- Settings format (Garmin Connect: one text field per schedule, 5 schedules, empty = unused, max 1000 characters): `name;km|min;step;step;…`, one step = `[Nx] size [text] [carbsg] [caf]` or `@position [text] [carbsg] [caf]`, e.g. `Long run;km;0 Gel 25g;10 Gel 25g;3x5 Gel 25g caf`; a `;` after every item, also with one item per line (Garmin Connect may drop line breaks); grams always with `g`; full reference in plain text: {BASE}llms-full.txt; plan builder: {BASE}plan/
+- Schedules: up to 5, each a chain of steps by distance (km or miles) or time (min) with repeats; per step a name, grams of carbs and a caffeine mark
+- Settings format (Garmin Connect: one text field per schedule, 5 schedules, empty = unused, max 1000 characters): `name;km|miles|min;step;step;…` (`miles` needs FuelSteps 1.1.0 or newer; write `miles`, not `mi`), one step = `[Nx] size [text] [carbsg] [caf]` or `@position [text] [carbsg] [caf]`, e.g. `Long run;km;0 Gel 25g;10 Gel 25g;3x5 Gel 25g caf`; a `;` after every item, also with one item per line (Garmin Connect may drop line breaks); grams always with `g`; full reference in plain text: {BASE}llms-full.txt; plan builder: {BASE}plan/
 - Alert: vibration, tone and full screen, 60 s / 150 m before the planned moment by default; afterwards the field keeps showing the last moment ("Gel · now", then "Gel · km 20")
 - Converting an existing plan (Maurten planner, coach, book): paste it into an AI assistant with the prompt on {BASE}plan/#ai; the builder can load the resulting import text to check the moments
 - Data: planned carbs, carbs per hour, fuel and caffeine moments saved in the activity (Garmin Connect charts)

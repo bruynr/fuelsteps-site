@@ -3,6 +3,7 @@
 
 export const LIMITS = {
   km: { min: 0.5, max: 100, step: 0.5 },
+  miles: { min: 0.5, max: 100, step: 0.5 }, // same rules as km; 1 mile = 1609.344 m on the watch
   min: { min: 5, max: 600, step: 5 },
   repeatMax: 30, nameMax: 16, fieldMax: 40, maxSteps: 12, carbsMax: 9999,
   importMax: 1000, // maxLength of a schedule field in Garmin Connect (settings.xml); the total store is ~8 KB
@@ -169,7 +170,7 @@ export function importText(schedule) {
 }
 
 // import text (from the builder, an AI assistant or typed) → schedule, or null when it isn't one:
-// "name;km|min;step;step;…", separated by ; and/or line breaks (also ";\n" and "\r\n"); blank segments are skipped, like the watch does
+// "name;km|miles|min;step;step;…", separated by ; and/or line breaks (also ";\n" and "\r\n"); blank segments are skipped, like the watch does
 export function parseImport(text) {
   return readImport(text).schedule;
 }
@@ -184,7 +185,9 @@ export function readImport(text) {
     .replace(/`|\*\*/g, "")
     .split(/[;\r\n]/).map((s) => s.trim().replace(/^[-*•]\s+/, "")).filter(Boolean);
   if (segs.length === 0) return fail("empty");
-  const at = segs.findIndex((s, i) => i > 0 && (s.toLowerCase() === "km" || s.toLowerCase() === "min")) - 1; // the name precedes the unit
+  const isUnit = (s) => s !== undefined && ["km", "miles", "min"].includes(s.toLowerCase());
+  let at = segs.findIndex((s, i) => i > 0 && isUnit(s)) - 1; // the name precedes the unit
+  if (at >= 0 && isUnit(segs[at + 2])) at++; // a name like "Miles" or "Km" after a sentence: the unit is the next segment
   if (at < 0) return fail("unit");
   const rest = segs.slice(at + 2);
   while (rest.length && !/^[@\d]/.test(rest[rest.length - 1])) rest.pop(); // a closing sentence, not a step

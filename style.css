@@ -118,6 +118,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
   display: block; width: 100%; margin-top: 4px; padding: 10px 12px; border: 1px solid #d9d2c3; border-radius: 10px; font: inherit; font-size: 17px; background: #fff; }
 .field-row fieldset { border: 0; padding: 0; } .field-row legend { font-size: 14px; font-weight: 700; color: var(--muted); padding: 0; }
 .field-row fieldset label { display: inline-block; margin: 8px 14px 0 0; font-size: 16px; color: var(--ink); font-weight: 600; }
+#plan-miles-note:not([hidden]) { display: block; margin: 6px 0 0; font-size: 14px; } /* own line under the radios, not next to Time */
 .steps-table, .moments-table, .examples { width: 100%; border-collapse: collapse; }
 .steps-table th, .moments-table th { text-align: left; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: #6e6e6e; padding: 8px 6px; }
 .steps-table td, .moments-table td, .examples td { padding: 8px 6px; border-top: 1px solid #eee; vertical-align: middle; font-size: 17px; }

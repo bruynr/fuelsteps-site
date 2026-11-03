@@ -2,6 +2,16 @@
 
 Source of https://fuelsteps.com/releases/ (English only). Newest first; one `## <date> · <label>` section per entry, label `App <version>` (the Connect IQ Store version, text as in the app's CHANGELOG.md and the store's "What's new") or `Website`. Lines starting with `- ` are bullets, other lines are paragraphs; `code` in backticks.
 
+## 2026-11-03 · App 1.1.0
+
+- Schedules in miles: use `miles` instead of `km` as the unit in the import text (fuelsteps.com/plan has a Miles option). The field, menu and alert then show mi
+
+## 2026-11-03 · Website
+
+- Plan builder: Miles as a third unit next to Kilometres and Time; the import text says `miles` (needs FuelSteps 1.1.0)
+- Settings format, AI prompt and `llms.txt`: `km`, `miles` or `min`
+- Loading an import text: a schedule named like a unit (Miles, Km) after a line of AI text now loads
+
 ## 2026-10-31 · Website
 
 - Plan builder: tip to match your schedule to the race's aid stations, and a second AI question for race schedules
