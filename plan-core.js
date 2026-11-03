@@ -185,7 +185,9 @@ export function readImport(text) {
     .replace(/`|\*\*/g, "")
     .split(/[;\r\n]/).map((s) => s.trim().replace(/^[-*•]\s+/, "")).filter(Boolean);
   if (segs.length === 0) return fail("empty");
-  const at = segs.findIndex((s, i) => i > 0 && ["km", "miles", "min"].includes(s.toLowerCase())) - 1; // the name precedes the unit
+  const isUnit = (s) => s !== undefined && ["km", "miles", "min"].includes(s.toLowerCase());
+  let at = segs.findIndex((s, i) => i > 0 && isUnit(s)) - 1; // the name precedes the unit
+  if (at >= 0 && isUnit(segs[at + 2])) at++; // a name like "Miles" or "Km" after a sentence: the unit is the next segment
   if (at < 0) return fail("unit");
   const rest = segs.slice(at + 2);
   while (rest.length && !/^[@\d]/.test(rest[rest.length - 1])) rest.pop(); // a closing sentence, not a step

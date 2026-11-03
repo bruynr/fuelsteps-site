@@ -272,6 +272,10 @@ test("parseImport: tolerates what AI assistants wrap around the import text", ()
   assert.deepEqual(parseImport("Long run;\nkm;\n@4 Banaan 25g;\n@8 Dextro 10g\n\nPaste this into Garmin Connect."), s); // prose after the steps
   assert.deepEqual(parseImport("- Long run\n- km\n- @4 Banaan 25g\n* @8 Dextro 10g"), s); // list bullets
   assert.deepEqual(parseImport("**Long run**;KM;@4 Banaan 25g;@8 Dextro 10g"), s); // bold name, unit in capitals
+  const named = (name) => sched("km", [step(4, 1, "Banaan", 25, false, true)], name);
+  for (const name of ["Miles", "Km", "Min"]) { // a name that is a unit word, with prose before it
+    assert.deepEqual(parseImport(`Here is your import text:\n${name};\nkm;\n@4 Banaan 25g`), named(name));
+  }
 });
 
 test("readImport: says why a text is not an import text", () => {
