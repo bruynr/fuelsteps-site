@@ -93,7 +93,10 @@ MENU_JS = """<script>
 
 # Umami Cloud: page views, referrers, countries and the builder events; cookieless, no personal data, so no consent banner
 UMAMI_ID = "458f80aa-006c-4354-9a7b-8bdda8850cbd"
-ANALYTICS = f'<script defer src="https://cloud.umami.is/script.js" data-website-id="{UMAMI_ID}" data-domains="fuelsteps.com,www.fuelsteps.com"></script>'
+# ?notrack switches Umami off in this browser (its own umami.disabled flag, also for the page view of that visit), ?track back on;
+# runs before the deferred tracker, so the owner's phone and laptop stay out of the numbers without a console
+NOTRACK = """<script>try { if (/[?&]notrack(&|$)/.test(location.search)) localStorage.setItem("umami.disabled", "1"); else if (/[?&]track(&|$)/.test(location.search)) localStorage.removeItem("umami.disabled"); } catch (e) {}</script>"""
+ANALYTICS = NOTRACK + f'\n<script defer src="https://cloud.umami.is/script.js" data-website-id="{UMAMI_ID}" data-domains="fuelsteps.com,www.fuelsteps.com"></script>'
 
 
 def images():
