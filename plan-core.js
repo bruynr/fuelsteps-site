@@ -175,7 +175,19 @@ export function parseImport(text) {
   return readImport(text).schedule;
 }
 
-// { schedule, error }: error says why a pasted text is not an import text ("empty", "unit", "steps", "step").
+// unit words people and AI assistants write in the six site languages → the watch token; "mi" stays out (looks like min)
+const UNIT_WORDS = {
+  km: ["km", "kms", "kilometer", "kilometers", "kilometre", "kilometres", "kilomètre", "kilomètres", "kilómetro", "kilómetros", "chilometro", "chilometri"],
+  miles: ["miles", "mile", "meile", "meilen", "mijl", "mijlen", "mille", "milles", "milla", "millas", "miglio", "miglia"],
+  min: ["min", "mins", "minute", "minutes", "minuten", "minuut", "minuto", "minutos", "minuti"],
+};
+const unitOf = (s) => {
+  if (s === undefined) return null;
+  const w = s.toLowerCase().replace(/\.$/, "");
+  return Object.keys(UNIT_WORDS).find((u) => UNIT_WORDS[u].includes(w)) ?? null;
+};
+
+// { schedule, error, step }: error says why a pasted text is not an import text ("empty", "unit", "steps", "step"; step = its number).
 // AI assistants wrap the text in code fences, bullets, bold or a sentence before and after; that is stripped here,
 // the builder writes clean text back, so the watch never sees it
 export function readImport(text) {
@@ -185,7 +197,7 @@ export function readImport(text) {
     .replace(/`|\*\*/g, "")
     .split(/[;\r\n]/).map((s) => s.trim().replace(/^[-*•]\s+/, "")).filter(Boolean);
   if (segs.length === 0) return fail("empty");
-  const isUnit = (s) => s !== undefined && ["km", "miles", "min"].includes(s.toLowerCase());
+  const isUnit = (s) => unitOf(s) !== null;
   let at = segs.findIndex((s, i) => i > 0 && isUnit(s)) - 1; // the name precedes the unit
   if (at >= 0 && isUnit(segs[at + 2])) at++; // a name like "Miles" or "Km" after a sentence: the unit is the next segment
   if (at < 0) return fail("unit");
@@ -193,8 +205,14 @@ export function readImport(text) {
   while (rest.length && !/^[@\d]/.test(rest[rest.length - 1])) rest.pop(); // a closing sentence, not a step
   if (rest.length === 0) return fail("steps");
   const steps = rest.slice(0, LIMITS.maxSteps).map(parseStepText);
-  if (steps.some((s) => s === null)) return fail("step");
-  return { schedule: { name: segs[at], unit: segs[at + 1].toLowerCase(), steps }, error: null };
+  const bad = steps.indexOf(null);
+  if (bad >= 0) return { ...fail("step"), step: bad + 1 };
+  return { schedule: { name: segs[at], unit: unitOf(segs[at + 1]), steps }, error: null };
+}
+
+// "start blank": no steps, the unit stays and so does the name (an empty name is the most common validation error)
+export function blankSchedule(schedule, fallbackName) {
+  return { name: String(schedule.name ?? "").trim() || fallbackName, unit: schedule.unit, steps: [] };
 }
 
 // "semicolon": a ; in the name or a step text would split the import on the watch; "long": over the paste limit
