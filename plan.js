@@ -1,6 +1,6 @@
 // plan.js — DOM layer of the plan builder. All logic lives in plan-core.js; this file renders state,
 // copies values, keeps the schedule in localStorage and sends Umami events (names only, no schedule contents).
-import { LIMITS, TEMPLATES, DEFAULT_TEXT, validate, moments, fromJSON, newStep, importText, importWarnings, readImport } from "./plan-core.js";
+import { LIMITS, TEMPLATES, DEFAULT_TEXT, validate, moments, fromJSON, newStep, importText, importWarnings, readImport, blankSchedule } from "./plan-core.js";
 
 const STORAGE = "fuelsteps-plan";
 const S = JSON.parse(document.getElementById("plan-i18n").textContent);
@@ -158,7 +158,9 @@ function renderErrors(v) {
   ul.replaceChildren();
   if (v.name) ul.append(el("li", {}, S["err_" + v.name]));
   if (schedule.steps.length === 0) ul.append(el("li", {}, S.err_no_steps));
-  v.steps.forEach((e, i) => { if (e) ul.append(el("li", {}, fmt(S.field_step, { n: i + 1 }) + ": " + S["err_" + e])); });
+  const lim = LIMITS[schedule.unit];
+  const limits = { min: numText(lim.min), max: numText(lim.max), unit: S[schedule.unit] }; // only the chosen unit's limits
+  v.steps.forEach((e, i) => { if (e) ul.append(el("li", {}, fmt(S.field_step, { n: i + 1 }) + ": " + fmt(S["err_" + e], limits))); });
   v.warnings.forEach((w, i) => { if (w) ul.append(el("li", { class: "warn" }, fmt(S.field_step, { n: i + 1 }) + ": " + S["warn_" + w])); });
 }
 
@@ -227,7 +229,7 @@ $("plan-template").addEventListener("change", (e) => {
   if (!choice) return;
   const tpl = TEMPLATES.find((t) => t.id === choice);
   if (schedule.steps.length && !confirm(S.template_confirm)) return;
-  schedule = tpl ? structuredClone(tpl.schedule) : { name: "", unit: schedule.unit, steps: [] };
+  schedule = tpl ? structuredClone(tpl.schedule) : blankSchedule(schedule, S.name_default);
   track("plan_template", { id: choice });
   render();
 });
@@ -248,8 +250,8 @@ $("plan-ai-race-copy").addEventListener("click", (e) => {
 });
 // an import text from an AI assistant (or typed) replaces the schedule, so the moments table checks it
 $("plan-ai-load").addEventListener("click", () => {
-  const { schedule: parsed, error } = readImport($("plan-ai-paste").value);
-  $("plan-ai-msg").textContent = parsed ? "" : S.ai_load_bad;
+  const { schedule: parsed, error, step } = readImport($("plan-ai-paste").value);
+  $("plan-ai-msg").textContent = parsed ? "" : fmt(S["ai_load_" + error], { n: step }); // what is wrong, so people can fix it
   track("plan_load_import", parsed ? { ok: true } : { ok: false, why: error }); // the reason, never the pasted text
   if (!parsed) return;
   schedule = parsed;

@@ -2,6 +2,12 @@
 
 Source of https://fuelsteps.com/releases/ (English only). Newest first; one `## <date> · <label>` section per entry, label `App <version>` (the Connect IQ Store version, text as in the app's CHANGELOG.md and the store's "What's new") or `Website`. Lines starting with `- ` are bullets, other lines are paragraphs; `code` in backticks.
 
+## 2026-11-05 · Website
+
+- Plan builder: starting from Empty keeps the schedule name (or gives it a default name), so it no longer starts with an error
+- Error messages show the limits of the chosen unit only (for example: at least 5 min)
+- Loading an import text: unit words like kilometers, minutes or Minuten are read as `km` or `min`, and a failed load says what is wrong (no unit, no steps, or which step)
+
 ## 2026-11-03 · App 1.1.0
 
 - Schedules in miles: use `miles` instead of `km` as the unit in the import text (fuelsteps.com/plan has a Miles option). The field, menu and alert then show mi

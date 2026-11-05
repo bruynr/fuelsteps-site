@@ -1,7 +1,7 @@
 // plan-core.test.js
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseStepText, formatStep, LIMITS, TEMPLATES, validate, moments, fromJSON, newStep, importSegments, importText, importWarnings, parseImport, readImport } from "./plan-core.js";
+import { parseStepText, formatStep, LIMITS, TEMPLATES, validate, moments, fromJSON, newStep, importSegments, importText, importWarnings, parseImport, readImport, blankSchedule } from "./plan-core.js";
 
 const step = (size, repeat, text, carbs, caf, abs = false) => ({ size, repeat, text, carbs, caf, abs });
 
@@ -307,4 +307,26 @@ test("validate: bare_number warning when the last word is a number without g", (
   const v = validate(sched("km", [step(5, 1, "Gel 25", 0, false), step(5, 1, "Gel 25", 25, false), step(5, 1, "Gel 100", 25, false), step(5, 1, "Gel 100", 0, true), step(5, 1, "Gel", 0, false)]));
   assert.deepEqual(v.warnings, ["bare_number", null, null, "bare_number", null]); // with grams filled in, the number is clearly part of the name
   assert.equal(v.ok, true);
+});
+
+test("blankSchedule: no steps, keeps unit and name, falls back to a default name", () => {
+  assert.deepEqual(blankSchedule(sched("min", [step(30, 6, "Gel", 25, false)], "Long run"), "My schedule"), sched("min", [], "Long run"));
+  assert.deepEqual(blankSchedule(sched("miles", [], "  "), "My schedule"), sched("miles", [], "My schedule"));
+  assert.equal(validate({ ...blankSchedule(sched("km", [], ""), "My schedule"), steps: [step(5, 1, "Gel", 25, false)] }).name, null); // no name_empty after starting blank
+});
+
+test("readImport: unit words in the six site languages read as km, miles or min", () => {
+  const unitOf = (u) => readImport(`Run;${u};5 Gel 25g`).schedule?.unit;
+  for (const u of ["km", "KM", "kms", "kilometers", "Kilometres", "kilometer", "kilomètres", "kilómetros", "chilometri", "km."]) assert.equal(unitOf(u), "km", u);
+  for (const u of ["miles", "mile", "Meilen", "mijl", "mijlen", "milles", "millas", "miglia"]) assert.equal(unitOf(u), "miles", u);
+  for (const u of ["min", "mins", "minutes", "Minuten", "minuut", "minuto", "minutos", "minuti", "min."]) assert.equal(unitOf(u), "min", u);
+  assert.equal(importText(readImport("Run;Minuten;30 Gel").schedule), "Run;\nmin;\n30 Gel"); // the builder writes the watch token back
+  assert.equal(readImport("Run;mi;5 Gel").error, "unit"); // mi stays rejected (looks like min)
+  assert.equal(readImport("Run;distance;5 Gel").error, "unit");
+});
+
+test("readImport: a broken step says which step", () => {
+  const r = readImport("Run;km;5 Gel;5Gel 25g x;10 Gel");
+  assert.equal(r.error, "step");
+  assert.equal(r.step, 2);
 });
